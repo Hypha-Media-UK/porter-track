@@ -5,7 +5,21 @@
       <h1 class="text-h4 font-weight-medium">Settings</h1>
     </header>
 
-    <!-- No tab navigation -->
+    <!-- Tab Navigation -->
+    <div class="ios-settings-view__tabs">
+      <v-tabs
+        v-model="currentTab"
+        color="primary"
+        centered
+        show-arrows
+        class="mb-6 ios-tabs"
+      >
+        <v-tab value="buildings" class="ios-tab">Buildings</v-tab>
+        <v-tab value="tasks" class="ios-tab">Tasks</v-tab>
+        <v-tab value="staff" class="ios-tab">Staff</v-tab>
+        <v-tab value="app" class="ios-tab">App Settings</v-tab>
+      </v-tabs>
+    </div>
 
     <!-- Tab Contents -->
     <v-window v-model="currentTab" class="ios-settings-view__content">
