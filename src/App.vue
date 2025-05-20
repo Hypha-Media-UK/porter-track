@@ -1,6 +1,6 @@
 <template>
   <v-app class="ios-app">
-    <!-- Top App Bar -->
+    <!-- Top App Bar with Navigation -->
     <v-app-bar flat class="ios-app-bar">
       <template v-if="shouldShowBackButton">
         <v-btn icon @click="goBack">
@@ -16,6 +16,44 @@
           Porter Track
         </v-app-bar-title>
       </template>
+      
+      <!-- Header Navigation Icons -->
+      <template v-slot:append>
+        <div class="d-flex align-center">
+          <v-btn
+            icon
+            :color="$route.path === '/' ? 'primary' : ''"
+            :to="{ path: '/' }"
+          >
+            <v-icon>mdi-home-outline</v-icon>
+          </v-btn>
+          
+          <v-btn
+            icon
+            :color="$route.path === '/shifts' && !$route.params.id ? 'primary' : ''"
+            :to="{ path: '/shifts' }"
+          >
+            <v-icon>mdi-history</v-icon>
+          </v-btn>
+          
+          <v-btn
+            icon
+            :color="$route.path === '/settings' ? 'primary' : ''"
+            :to="{ path: '/settings', query: { tab: 'app' } }"
+          >
+            <v-icon>mdi-cog-outline</v-icon>
+          </v-btn>
+          
+          <v-btn
+            v-if="activeShift"
+            icon
+            :color="$route.path.startsWith('/shifts/') ? 'primary' : ''"
+            :to="{ name: 'ShiftManagement', params: { id: activeShift.id } }"
+          >
+            <v-icon>mdi-clipboard-clock-outline</v-icon>
+          </v-btn>
+        </div>
+      </template>
     </v-app-bar>
 
     <!-- Main Content -->
@@ -28,54 +66,20 @@
         </router-view>
       </v-container>
     </v-main>
-
-    <!-- Bottom Navigation -->
-    <v-bottom-navigation
-      grow
-      color="primary"
-      class="ios-bottom-nav"
-    >
-      <v-btn
-        :to="{ path: '/' }"
-        :value="$route.path === '/'"
-      >
-        <v-icon>mdi-home-outline</v-icon>
-        <span>Home</span>
-      </v-btn>
-      
-      <v-btn
-        :to="{ path: '/settings', query: { tab: 'buildings' } }"
-        :value="$route.path === '/settings' && $route.query.tab === 'buildings'"
-      >
-        <v-icon>mdi-office-building-outline</v-icon>
-        <span>Buildings</span>
-      </v-btn>
-      
-      <v-btn
-        :to="{ path: '/settings', query: { tab: 'tasks' } }"
-        :value="$route.path === '/settings' && $route.query.tab === 'tasks'"
-      >
-        <v-icon>mdi-clipboard-text-outline</v-icon>
-        <span>Tasks</span>
-      </v-btn>
-      
-      <v-btn
-        :to="{ path: '/settings', query: { tab: 'app' } }"
-        :value="$route.path === '/settings' && $route.query.tab === 'app'"
-      >
-        <v-icon>mdi-cog-outline</v-icon>
-        <span>Settings</span>
-      </v-btn>
-    </v-bottom-navigation>
   </v-app>
 </template>
 
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { useShiftsStore } from './stores/shifts'
 
 const route = useRoute()
 const router = useRouter()
+const shiftsStore = useShiftsStore()
+
+// Get active shift for current shift button
+const activeShift = computed(() => shiftsStore.activeShift)
 
 // Determine if we should show back button (only on non-root routes)
 const shouldShowBackButton = computed(() => {
@@ -96,6 +100,11 @@ const pageTitle = computed(() => {
 const goBack = () => {
   router.go(-1)
 }
+
+// Fetch shifts on app mount to have data for the header nav
+onMounted(async () => {
+  await shiftsStore.fetchShifts()
+})
 </script>
 
 <style>

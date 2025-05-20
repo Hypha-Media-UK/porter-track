@@ -45,38 +45,8 @@
           </div>
         </IOSCard>
         
-        <!-- Previous Shift Panel -->
-        <IOSCard v-if="previousShift" class="mb-4">
-          <div class="ios-card-header d-flex justify-space-between align-center">
-            <h2 class="text-h6 font-weight-medium">Previous Shift</h2>
-            <StatusBadge status="completed" label="Completed" />
-          </div>
-          
-          <div class="ios-card-content">
-            <div class="d-flex justify-space-between align-center mb-2">
-              <div>
-                <h3 class="text-h5">{{ previousShift.shift_type }}</h3>
-                <p class="text-subtitle-2 text-medium-emphasis">
-                  Supervisor: {{ previousShift.supervisor?.name || 'N/A' }}
-                </p>
-                <p class="text-subtitle-2 text-medium-emphasis">
-                  Ended: {{ formatDateTime(previousShift.end_time) }}
-                </p>
-              </div>
-              
-              <IOSButton
-                color="secondary"
-                variant="text"
-                @click="navigateTo(`/shifts/${previousShift.id}`)"
-              >
-                View Details
-              </IOSButton>
-            </div>
-          </div>
-        </IOSCard>
-        
         <!-- Start New Shift Button -->
-        <div v-if="!activeShift" class="d-flex justify-center mb-4">
+        <div v-if="!activeShift" class="d-flex justify-center mb-5">
           <IOSButton
             color="primary"
             prependIcon="mdi-calendar-plus"
@@ -84,6 +54,39 @@
           >
             Start New Shift
           </IOSButton>
+        </div>
+        
+        <!-- Previous Shifts Section -->
+        <h2 class="text-h6 font-weight-medium mb-3">Previous Shifts</h2>
+        
+        <div v-if="recentShifts.length === 0" class="text-center py-4">
+          <p class="text-medium-emphasis">No previous shifts found</p>
+        </div>
+        
+        <div v-else class="previous-shifts-list mb-5">
+          <IOSCard v-for="shift in recentShifts" :key="shift.id" class="mb-3">
+            <div class="ios-card-content">
+              <div class="d-flex justify-space-between align-center">
+                <div>
+                  <h3 class="text-h6">{{ shift.shift_type }}</h3>
+                  <p class="text-subtitle-2 text-medium-emphasis">
+                    Supervisor: {{ shift.supervisor?.name || 'N/A' }}
+                  </p>
+                  <p class="text-caption text-medium-emphasis">
+                    Ended: {{ formatDateTime(shift.end_time) }}
+                  </p>
+                </div>
+                
+                <IOSButton
+                  color="secondary"
+                  variant="text"
+                  @click="navigateTo(`/shifts/${shift.id}`)"
+                >
+                  View Details
+                </IOSButton>
+              </div>
+            </div>
+          </IOSCard>
         </div>
         
         <!-- View All Shifts Button -->
@@ -98,29 +101,6 @@
           </IOSButton>
         </div>
       </template>
-    </div>
-    
-    <!-- Quick Access Cards -->
-    <div class="ios-home__cards">
-      <IOSCard
-        v-for="item in menuItems"
-        :key="item.title"
-        class="ios-home__card"
-        @click="navigateTo(item.path)"
-      >
-        <div class="ios-home__card-content">
-          <v-icon
-            :icon="item.icon"
-            size="x-large"
-            :color="item.color"
-            class="mb-3"
-          ></v-icon>
-          <h2 class="text-h6 mb-1">{{ item.title }}</h2>
-          <p class="text-body-2 text-center text-medium-emphasis">
-            {{ item.description }}
-          </p>
-        </div>
-      </IOSCard>
     </div>
     
     <!-- App Information -->
@@ -207,6 +187,7 @@ const errors = ref({
 // Computed properties
 const activeShift = computed(() => shiftsStore.activeShift)
 const previousShift = computed(() => shiftsStore.previousShift)
+const recentShifts = computed(() => shiftsStore.recentShifts)
 const supervisors = computed(() => staffStore.getSupervisors)
 
 // Fetch shifts on component mount
@@ -268,37 +249,7 @@ const formatDateTime = (dateString) => {
   })
 }
 
-// Menu items for quick access
-const menuItems = [
-  {
-    title: 'Buildings',
-    description: 'Manage hospital buildings and departments',
-    path: '/settings?tab=buildings',
-    icon: 'mdi-office-building-outline',
-    color: 'primary'
-  },
-  {
-    title: 'Tasks',
-    description: 'Create and manage porter tasks',
-    path: '/settings?tab=tasks',
-    icon: 'mdi-clipboard-text-outline',
-    color: 'secondary'
-  },
-  {
-    title: 'Staff',
-    description: 'Manage porters and supervisors',
-    path: '/settings?tab=staff',
-    icon: 'mdi-account-group-outline',
-    color: 'success'
-  },
-  {
-    title: 'Settings',
-    description: 'Configure application preferences',
-    path: '/settings?tab=app',
-    icon: 'mdi-cog-outline',
-    color: 'info'
-  }
-]
+// No menu items needed anymore as we removed the cards
 
 // Navigation function
 const navigateTo = (path) => {
@@ -321,34 +272,11 @@ const navigateTo = (path) => {
   margin-bottom: 32px;
 }
 
-.ios-home__cards {
+/* Previous shifts list styling */
+.previous-shifts-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  flex: 1;
-}
-
-.ios-home__card {
-  cursor: pointer;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
-
-.ios-home__card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.ios-home__card:active {
-  transform: translateY(0);
-  opacity: 0.9;
-}
-
-.ios-home__card-content {
-  padding: 24px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
+  gap: 8px;
 }
 
 .ios-home__info {
@@ -356,16 +284,5 @@ const navigateTo = (path) => {
   padding: 16px;
 }
 
-@media (min-width: 768px) {
-  .ios-home__cards {
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-  
-  .ios-home__card {
-    flex: 0 0 calc(33.333% - 16px);
-    max-width: calc(33.333% - 16px);
-  }
-}
+/* No media queries needed for removed cards */
 </style>

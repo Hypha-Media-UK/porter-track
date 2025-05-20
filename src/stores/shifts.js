@@ -44,6 +44,13 @@ export const useShiftsStore = defineStore('shifts', () => {
       !porter.departmentAssignments || !porter.departmentAssignments.some(a => a.is_active)
     )
   })
+  
+  // Get the last 3 completed shifts
+  const recentShifts = computed(() => {
+    return shifts.value
+      .filter(shift => !shift.is_active)
+      .slice(0, 3)
+  })
 
   // Actions
   const fetchShifts = async () => {
@@ -552,6 +559,7 @@ export const useShiftsStore = defineStore('shifts', () => {
     getShiftPorters,
     getAssignedPorters,
     getRunnerPorters,
+    recentShifts,
     
     // Actions
     fetchShifts,
