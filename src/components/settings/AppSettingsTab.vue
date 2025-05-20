@@ -6,6 +6,9 @@
       <p class="text-body-1 text-medium-emphasis">Application settings and information</p>
     </div>
     
+    <!-- Department Designations -->
+    <DepartmentDesignationsList class="mb-6" />
+    
     <!-- App Info -->
     <IOSCard>
       <div class="ios-card-header">
@@ -25,6 +28,7 @@
 
 <script setup>
 import IOSCard from '../common/IOSCard.vue'
+import DepartmentDesignationsList from '../departments/DepartmentDesignationsList.vue'
 </script>
 
 <style scoped>

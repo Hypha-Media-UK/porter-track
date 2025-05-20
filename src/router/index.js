@@ -12,6 +12,16 @@ const routes = [
     component: () => import('../views/SettingsView.vue'),
     props: (route) => ({ activeTab: route.query.tab || 'app' })
   },
+  {
+    path: '/shifts',
+    name: 'Shifts',
+    component: () => import('../views/ShiftManagementView.vue')
+  },
+  {
+    path: '/shifts/:id',
+    name: 'ShiftManagement',
+    component: () => import('../views/ShiftManagementView.vue')
+  },
   // Redirect legacy routes to the new tabbed settings
   {
     path: '/buildings',

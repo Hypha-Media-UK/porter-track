@@ -8,6 +8,98 @@
       </p>
     </div>
     
+    <!-- Shift Management Section -->
+    <div class="ios-home__shift-section mb-4">
+      <div v-if="shiftsStore.isLoading" class="text-center py-4">
+        <LoadingIndicator />
+        <p class="mt-2 text-medium-emphasis">Loading shift data...</p>
+      </div>
+      
+      <template v-else>
+        <!-- Active Shift Panel -->
+        <IOSCard v-if="activeShift" class="mb-4">
+          <div class="ios-card-header d-flex justify-space-between align-center">
+            <h2 class="text-h6 font-weight-medium">Current Shift</h2>
+            <StatusBadge status="success" label="Active" />
+          </div>
+          
+          <div class="ios-card-content">
+            <div class="d-flex justify-space-between align-center mb-2">
+              <div>
+                <h3 class="text-h5">{{ activeShift.shift_type }}</h3>
+                <p class="text-subtitle-2 text-medium-emphasis">
+                  Supervisor: {{ activeShift.supervisor?.name || 'N/A' }}
+                </p>
+                <p class="text-subtitle-2 text-medium-emphasis">
+                  Started: {{ formatDateTime(activeShift.start_time) }}
+                </p>
+              </div>
+              
+              <IOSButton
+                color="primary"
+                @click="navigateTo(`/shifts/${activeShift.id}`)"
+              >
+                Manage Shift
+              </IOSButton>
+            </div>
+          </div>
+        </IOSCard>
+        
+        <!-- Previous Shift Panel -->
+        <IOSCard v-if="previousShift" class="mb-4">
+          <div class="ios-card-header d-flex justify-space-between align-center">
+            <h2 class="text-h6 font-weight-medium">Previous Shift</h2>
+            <StatusBadge status="completed" label="Completed" />
+          </div>
+          
+          <div class="ios-card-content">
+            <div class="d-flex justify-space-between align-center mb-2">
+              <div>
+                <h3 class="text-h5">{{ previousShift.shift_type }}</h3>
+                <p class="text-subtitle-2 text-medium-emphasis">
+                  Supervisor: {{ previousShift.supervisor?.name || 'N/A' }}
+                </p>
+                <p class="text-subtitle-2 text-medium-emphasis">
+                  Ended: {{ formatDateTime(previousShift.end_time) }}
+                </p>
+              </div>
+              
+              <IOSButton
+                color="secondary"
+                variant="text"
+                @click="navigateTo(`/shifts/${previousShift.id}`)"
+              >
+                View Details
+              </IOSButton>
+            </div>
+          </div>
+        </IOSCard>
+        
+        <!-- Start New Shift Button -->
+        <div v-if="!activeShift" class="d-flex justify-center mb-4">
+          <IOSButton
+            color="primary"
+            prependIcon="mdi-calendar-plus"
+            @click="navigateTo('/shifts')"
+          >
+            Start New Shift
+          </IOSButton>
+        </div>
+        
+        <!-- View All Shifts Button -->
+        <div class="d-flex justify-center mb-4">
+          <IOSButton
+            color="secondary"
+            variant="text"
+            prependIcon="mdi-history"
+            @click="navigateTo('/shifts')"
+          >
+            View All Archived Shifts
+          </IOSButton>
+        </div>
+      </template>
+    </div>
+    
     <!-- Quick Access Cards -->
     <div class="ios-home__cards">
       <IOSCard
@@ -41,10 +133,39 @@
 </template>
 
 <script setup>
+import { onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { useShiftsStore } from '../stores/shifts'
 import IOSCard from '../components/common/IOSCard.vue'
+import IOSButton from '../components/common/IOSButton.vue'
+import LoadingIndicator from '../components/common/LoadingIndicator.vue'
+import StatusBadge from '../components/common/StatusBadge.vue'
 
 const router = useRouter()
+const shiftsStore = useShiftsStore()
+
+// Computed properties
+const activeShift = computed(() => shiftsStore.activeShift)
+const previousShift = computed(() => shiftsStore.previousShift)
+
+// Fetch shifts on component mount
+onMounted(async () => {
+  await shiftsStore.fetchShifts()
+})
+
+// Format date and time
+const formatDateTime = (dateString) => {
+  if (!dateString) return 'N/A'
+  
+  const date = new Date(dateString)
+  return date.toLocaleString('en-GB', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
+}
 
 // Menu items for quick access
 const menuItems = [
@@ -61,6 +182,13 @@ const menuItems = [
     path: '/settings?tab=tasks',
     icon: 'mdi-clipboard-text-outline',
     color: 'secondary'
+  },
+  {
+    title: 'Staff',
+    description: 'Manage porters and supervisors',
+    path: '/settings?tab=staff',
+    icon: 'mdi-account-group-outline',
+    color: 'success'
   },
   {
     title: 'Settings',
