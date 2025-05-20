@@ -398,11 +398,11 @@ const confirmEndShift = () => {
 
 const endShift = async () => {
   try {
-    await shiftsStore.endShift(shiftId.value)
+    await shiftsStore.endShift(shiftId.value, router)
     endShiftDialogVisible.value = false
     
-    // Refresh shift details
-    await shiftsStore.fetchShiftDetails(shiftId.value)
+    // We don't need to fetch shift details or do anything else here
+    // since the user will be redirected to the home page
   } catch (error) {
     console.error('Error ending shift:', error)
   }

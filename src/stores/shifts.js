@@ -254,7 +254,14 @@ export const useShiftsStore = defineStore('shifts', () => {
     }
   }
 
-  const endShift = async (shiftId) => {
+  // Reset shift-related state
+  const resetShiftState = () => {
+    shiftDetails.value = null;
+    // Reset any other shift-related cached data
+    console.log('Shift state reset');
+  }
+
+  const endShift = async (shiftId, router) => {
     try {
       const { data, error: err } = await supabase
         .from('shifts')
@@ -275,7 +282,17 @@ export const useShiftsStore = defineStore('shifts', () => {
         }
         
         activeShift.value = null
-        await fetchShifts() // Refresh the shifts list
+        
+        // Clear current shift state
+        resetShiftState();
+        
+        // Refresh the shifts list to update previous shift
+        await fetchShifts()
+        
+        // Redirect to home page if router is provided
+        if (router) {
+          router.push('/');
+        }
       }
       
       return data
