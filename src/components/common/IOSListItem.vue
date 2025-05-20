@@ -2,99 +2,87 @@
   <div class="ios-list-item" :class="{ 'ios-list-item--editing': isEditing }">
     <!-- View Mode -->
     <div v-if="!isEditing" class="ios-list-item__content">
-      <!-- Grid Layout Container -->
-      <div class="ios-list-item__grid">
-        <!-- Content Area Column -->
-        <div class="ios-list-item__text-col" @click="startEditing">
-          <div class="ios-list-item__primary">{{ modelValue }}</div>
-          <div v-if="secondary" class="ios-list-item__secondary">{{ secondary }}</div>
-        </div>
-        
-        <!-- Actions Column -->
-        <div class="ios-list-item__actions-col">
-          <slot name="actions">
-            <v-btn 
-              v-if="departmentAssignable" 
-              icon="mdi-office-building-outline" 
-              density="comfortable" 
-              variant="text" 
-              size="small" 
-              :color="hasDepartment ? departmentColor : 'grey'"
-              @click.stop="$emit('assign-department')"
-            ></v-btn>
-            <v-btn 
-              v-if="editable" 
-              icon="mdi-pencil-outline" 
-              density="comfortable" 
-              variant="text" 
-              size="small" 
-              color="primary" 
-              @click.stop="startEditing"
-            ></v-btn>
-            <v-btn 
-              v-if="deletable" 
-              icon="mdi-delete-outline" 
-              density="comfortable" 
-              variant="text" 
-              size="small" 
-              color="error" 
-              @click.stop="$emit('delete')"
-            ></v-btn>
-          </slot>
-        </div>
+      <div class="ios-list-item__text" @click="startEditing">
+        <div class="ios-list-item__primary">{{ modelValue }}</div>
+        <div v-if="secondary" class="ios-list-item__secondary">{{ secondary }}</div>
+      </div>
+      
+      <div class="ios-list-item__actions">
+        <slot name="actions">
+          <v-btn 
+            v-if="departmentAssignable" 
+            icon="mdi-office-building-outline" 
+            density="comfortable" 
+            variant="text" 
+            size="small" 
+            :color="hasDepartment ? departmentColor : 'grey'"
+            @click.stop="$emit('assign-department')"
+          ></v-btn>
+          <v-btn 
+            v-if="editable" 
+            icon="mdi-pencil-outline" 
+            density="comfortable" 
+            variant="text" 
+            size="small" 
+            color="primary" 
+            @click.stop="startEditing"
+          ></v-btn>
+          <v-btn 
+            v-if="deletable" 
+            icon="mdi-delete-outline" 
+            density="comfortable" 
+            variant="text" 
+            size="small" 
+            color="error" 
+            @click.stop="$emit('delete')"
+          ></v-btn>
+        </slot>
       </div>
     </div>
     
     <!-- Edit Mode -->
     <div v-else class="ios-list-item__content">
-      <div class="ios-list-item__grid">
-        <!-- Input Field Column -->
-        <div class="ios-list-item__text-col">
-          <v-text-field
-            ref="inputField"
-            v-model="editValue"
-            :placeholder="placeholder"
-            variant="underlined"
-            color="primary"
-            hide-details
-            density="comfortable"
-            bg-color="transparent"
-            class="ios-list-item__input"
-            @keyup.enter="saveEdit"
-            @keyup.esc="cancelEdit"
-            @blur="handleBlur"
-          ></v-text-field>
-        </div>
-        
-        <!-- Action Buttons Column -->
-        <div class="ios-list-item__actions-col">
-          <v-btn
-            icon="mdi-close"
-            variant="text"
-            density="comfortable"
-            size="small" 
-            color="error"
-            @click.stop="cancelEdit"
-          ></v-btn>
-          <v-btn
-            icon="mdi-check"
-            variant="text"
-            density="comfortable"
-            size="small"
-            color="success"
-            @click.stop="saveEdit"
-          ></v-btn>
-        </div>
+      <div class="ios-list-item__text">
+        <v-text-field
+          ref="inputField"
+          v-model="editValue"
+          :placeholder="placeholder"
+          variant="underlined"
+          color="primary"
+          hide-details
+          density="comfortable"
+          bg-color="transparent"
+          class="ios-list-item__input"
+          @keyup.enter="saveEdit"
+          @keyup.esc="cancelEdit"
+          @blur="handleBlur"
+        ></v-text-field>
+      </div>
+      
+      <div class="ios-list-item__actions">
+        <v-btn
+          icon="mdi-close"
+          variant="text"
+          density="comfortable"
+          size="small" 
+          color="error"
+          @click.stop="cancelEdit"
+        ></v-btn>
+        <v-btn
+          icon="mdi-check"
+          variant="text"
+          density="comfortable"
+          size="small"
+          color="success"
+          @click.stop="saveEdit"
+        ></v-btn>
       </div>
     </div>
-    
-    <!-- Extra Slot for Additional Content -->
-    <slot></slot>
   </div>
 </template>
 
 <script setup>
-import { ref, nextTick, computed, watch } from 'vue'
+import { ref, nextTick, watch } from 'vue'
 
 const props = defineProps({
   modelValue: {
@@ -104,14 +92,6 @@ const props = defineProps({
   secondary: {
     type: String,
     default: ''
-  },
-  icon: {
-    type: String,
-    default: ''
-  },
-  iconColor: {
-    type: String,
-    default: 'primary'
   },
   editable: {
     type: Boolean,
@@ -185,7 +165,7 @@ const cancelEdit = () => {
 const handleBlur = (event) => {
   // Only cancel if clicking outside both the input and the edit buttons
   const isClickOnEditButtons = event.relatedTarget && 
-                              event.relatedTarget.closest('.ios-list-item__edit-actions')
+                              event.relatedTarget.closest('.ios-list-item__actions')
   
   if (!isClickOnEditButtons) {
     cancelEdit()
@@ -206,26 +186,21 @@ const handleBlur = (event) => {
 }
 
 .ios-list-item__content {
-  width: 100%;
-  min-height: 44px;
-}
-
-.ios-list-item__grid {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  grid-template-areas: "text actions";
-  gap: 12px;
+  display: flex;
+  justify-content: space-between;
   align-items: center;
+  min-height: 44px;
   width: 100%;
 }
 
-.ios-list-item__text-col {
-  grid-area: text;
+.ios-list-item__text {
+  flex: 1;
   cursor: text;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  padding-right: 8px;
+  padding-right: 16px;
+  text-align: left;
 }
 
 .ios-list-item__primary {
@@ -249,13 +224,12 @@ const handleBlur = (event) => {
   text-align: left;
 }
 
-.ios-list-item__actions-col {
-  grid-area: actions;
+.ios-list-item__actions {
   display: flex;
   gap: 8px;
   justify-content: flex-end;
-  min-width: 100px; /* Fixed width for actions */
-  justify-self: end; /* Ensure right alignment within grid */
+  min-width: 100px;
+  flex-shrink: 0;
 }
 
 .ios-list-item__input {
