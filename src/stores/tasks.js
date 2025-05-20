@@ -51,7 +51,7 @@ export const useTasksStore = defineStore('tasks', () => {
         
         task.taskItems = taskItemsData || []
         
-        // Fetch department associations
+        // Fetch department associations for the task
         const { data: departmentTasksData, error: departmentTasksError } = await supabase
           .from('department_tasks')
           .select(`
@@ -70,6 +70,28 @@ export const useTasksStore = defineStore('tasks', () => {
         
         // Extract departments from the join result
         task.departments = departmentTasksData?.map(item => item.departments) || []
+        
+        // Fetch department associations for each task item
+        for (const taskItem of task.taskItems) {
+          const { data: itemDepartmentsData, error: itemDepartmentsError } = await supabase
+            .from('task_item_departments')
+            .select(`
+              id,
+              department_id,
+              departments:department_id (
+                id,
+                name,
+                floor,
+                building_id
+              )
+            `)
+            .eq('task_item_id', taskItem.id)
+          
+          if (itemDepartmentsError) throw itemDepartmentsError
+          
+          // Extract departments from the join result
+          taskItem.departments = itemDepartmentsData?.map(item => item.departments) || []
+        }
       }
       
       tasks.value = tasksData
@@ -182,6 +204,8 @@ export const useTasksStore = defineStore('tasks', () => {
           if (!tasks.value[taskIndex].taskItems) {
             tasks.value[taskIndex].taskItems = []
           }
+          // Initialize departments array for the new task item
+          data[0].departments = []
           tasks.value[taskIndex].taskItems.push(data[0])
         }
       }
@@ -215,6 +239,8 @@ export const useTasksStore = defineStore('tasks', () => {
           if (task.taskItems) {
             const taskItemIndex = task.taskItems.findIndex(i => i.id === taskItem.id)
             if (taskItemIndex !== -1) {
+              // Preserve departments when updating
+              data[0].departments = task.taskItems[taskItemIndex].departments
               task.taskItems[taskItemIndex] = data[0]
               break
             }
@@ -289,6 +315,41 @@ export const useTasksStore = defineStore('tasks', () => {
     }
   }
 
+  const updateTaskItemDepartments = async (taskItemId, departmentIds) => {
+    try {
+      // First, delete all existing associations for this task item
+      const { error: deleteError } = await supabase
+        .from('task_item_departments')
+        .delete()
+        .eq('task_item_id', taskItemId)
+      
+      if (deleteError) throw deleteError
+      
+      // Create new associations
+      if (departmentIds.length > 0) {
+        const taskItemDepartmentsToInsert = departmentIds.map(departmentId => ({
+          department_id: departmentId,
+          task_item_id: taskItemId
+        }))
+        
+        const { error: insertError } = await supabase
+          .from('task_item_departments')
+          .insert(taskItemDepartmentsToInsert)
+        
+        if (insertError) throw insertError
+      }
+      
+      // Update local state - we need to fetch the updated departments data
+      await fetchTasks() // Refresh the full tasks data
+      
+      return true
+    } catch (err) {
+      console.error('Error updating task item departments:', err)
+      error.value = err.message || 'Failed to update task item departments'
+      throw err
+    }
+  }
+
   return {
     // State
     tasks,
@@ -307,6 +368,7 @@ export const useTasksStore = defineStore('tasks', () => {
     createTaskItem,
     updateTaskItem,
     deleteTaskItem,
-    updateTaskDepartments
+    updateTaskDepartments,
+    updateTaskItemDepartments
   }
 })

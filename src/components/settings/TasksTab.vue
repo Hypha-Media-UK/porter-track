@@ -51,7 +51,26 @@
             placeholder="Task name"
             @update:model-value="updateTaskName(task.id, $event)"
             @delete="confirmDeleteTask(task)"
-          />
+          >
+            <!-- Department assignment button for task -->
+            <div class="d-flex align-center ml-2">
+              <v-badge
+                :content="task.departments?.length || 0"
+                :model-value="task.departments?.length > 0"
+                color="primary"
+                offset-x="8"
+                offset-y="8"
+              >
+                <v-btn
+                  icon="mdi-office-building-outline"
+                  size="small"
+                  variant="text"
+                  color="primary"
+                  @click.stop="openDepartmentAssignmentDialog(task)"
+                ></v-btn>
+              </v-badge>
+            </div>
+          </IOSListItem>
         </div>
         
         <!-- Task Items List -->
@@ -69,7 +88,26 @@
               placeholder="Task item name"
               @update:model-value="updateTaskItemName(item.id, $event)"
               @delete="confirmDeleteTaskItem(item)"
-            />
+            >
+              <!-- Department assignment button for task item -->
+              <div class="d-flex align-center ml-2">
+                <v-badge
+                  :content="item.departments?.length || 0"
+                  :model-value="item.departments?.length > 0"
+                  color="secondary"
+                  offset-x="8"
+                  offset-y="8"
+                >
+                  <v-btn
+                    icon="mdi-office-building-outline"
+                    size="small"
+                    variant="text"
+                    color="secondary"
+                    @click.stop="openTaskItemDepartmentDialog(task, item)"
+                  ></v-btn>
+                </v-badge>
+              </div>
+            </IOSListItem>
           </div>
           
           <!-- Empty Task Items State -->
@@ -86,28 +124,6 @@
               @click="addTaskItem(task)"
             >
               Add Task Item
-            </IOSButton>
-          </div>
-        </div>
-        
-        <!-- Department Associations -->
-        <div class="ios-card-content task-departments">
-          <!-- Department Assignment Button -->
-          <div class="d-flex justify-space-between align-center mt-1">
-            <div>
-              <h3 class="text-subtitle-1 font-weight-medium">Assigned Departments</h3>
-              <p v-if="task.departments && task.departments.length" class="text-caption text-secondary">
-                {{ task.departments.length }} department{{ task.departments.length !== 1 ? 's' : '' }} assigned
-              </p>
-              <p v-else class="text-caption text-secondary">Not assigned to any departments</p>
-            </div>
-            <IOSButton
-              variant="text"
-              size="small"
-              prependIcon="mdi-office-building-outline"
-              @click="openDepartmentAssignmentDialog(task)"
-            >
-              Assign
             </IOSButton>
           </div>
         </div>
@@ -206,7 +222,7 @@
       </v-card>
     </v-dialog>
     
-    <!-- Department Assignment Dialog -->
+    <!-- Task Department Assignment Dialog -->
     <v-dialog v-model="departmentAssignDialogVisible" max-width="500" persistent>
       <v-card class="ios-dialog">
         <v-card-title class="text-h5">Assign to Departments</v-card-title>
@@ -258,6 +274,19 @@
         </v-card-actions>
       </v-card>
     </v-dialog>
+    
+    <!-- Task Item Department Assignment Dialog -->
+    <v-dialog v-model="taskItemDepartmentDialogVisible" max-width="500" persistent>
+      <TaskItemDepartmentAssociation
+        v-if="taskItemDepartmentDialogVisible"
+        :task-item-id="currentTaskItem?.id"
+        :task-item-name="currentTaskItem?.name"
+        :buildings="buildingsStore.buildings"
+        :selected-departments="currentTaskItem?.departments || []"
+        @save="saveTaskItemDepartments"
+        @cancel="taskItemDepartmentDialogVisible = false"
+      />
+    </v-dialog>
   </section>
 </template>
 
@@ -268,6 +297,7 @@ import { useBuildingsStore } from '../../stores/buildings'
 import IOSCard from '../common/IOSCard.vue'
 import IOSListItem from '../common/IOSListItem.vue'
 import IOSButton from '../common/IOSButton.vue'
+import TaskItemDepartmentAssociation from '../task-items/TaskItemDepartmentAssociation.vue'
 
 // Stores
 const tasksStore = useTasksStore()
@@ -278,11 +308,13 @@ const deleteDialogVisible = ref(false)
 const taskDialogVisible = ref(false)
 const taskItemDialogVisible = ref(false)
 const departmentAssignDialogVisible = ref(false)
+const taskItemDepartmentDialogVisible = ref(false)
 const deleteType = ref('item')
 const itemToDelete = ref(null)
 const newTask = ref({ name: '' })
 const newTaskItem = ref({ name: '', task_id: null })
 const currentTask = ref(null)
+const currentTaskItem = ref(null)
 const selectedDepartments = ref([])
 
 // Fetch data
@@ -360,7 +392,7 @@ const confirmDeleteTaskItem = (taskItem) => {
   deleteDialogVisible.value = true
 }
 
-// Department assignment operations
+// Department assignment operations for tasks
 const openDepartmentAssignmentDialog = (task) => {
   currentTask.value = task
   selectedDepartments.value = task.departments 
@@ -375,6 +407,22 @@ const saveDepartmentAssignments = async () => {
     departmentAssignDialogVisible.value = false
   } catch (error) {
     console.error('Error updating department assignments:', error)
+  }
+}
+
+// Department assignment operations for task items
+const openTaskItemDepartmentDialog = (task, taskItem) => {
+  currentTask.value = task
+  currentTaskItem.value = taskItem
+  taskItemDepartmentDialogVisible.value = true
+}
+
+const saveTaskItemDepartments = async (data) => {
+  try {
+    await tasksStore.updateTaskItemDepartments(data.taskItemId, data.departmentIds)
+    taskItemDepartmentDialogVisible.value = false
+  } catch (error) {
+    console.error('Error updating task item departments:', error)
   }
 }
 
