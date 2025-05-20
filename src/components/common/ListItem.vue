@@ -16,7 +16,7 @@
             @click.stop="$emit('assign-department')"
             title="Assign to department"
           >
-            <span class="icon">🏢</span>
+            <Icon name="building" />
           </button>
           
           <button 
@@ -25,7 +25,7 @@
             @click.stop="startEditing"
             title="Edit"
           >
-            <span class="icon">✎</span>
+            <Icon name="edit" />
           </button>
           
           <button 
@@ -34,7 +34,7 @@
             @click.stop="$emit('delete')"
             title="Delete"
           >
-            <span class="icon">🗑️</span>
+            <Icon name="delete" />
           </button>
         </slot>
       </div>
@@ -60,7 +60,7 @@
           @click.stop="cancelEdit"
           title="Cancel"
         >
-          <span class="icon">✕</span>
+          <Icon name="close" />
         </button>
         
         <button
@@ -68,7 +68,7 @@
           @click.stop="saveEdit"
           title="Save"
         >
-          <span class="icon">✓</span>
+          <Icon name="check" />
         </button>
       </div>
     </div>
@@ -77,6 +77,7 @@
 
 <script setup>
 import { ref, nextTick, watch } from 'vue'
+import Icon from './Icon.vue'
 
 const props = defineProps({
   modelValue: {
@@ -256,10 +257,6 @@ const handleBlur = (event) => {
   
   &:hover {
     background-color: $color-gray-200;
-  }
-  
-  .icon {
-    font-size: $font-size-md;
   }
 }
 </style>

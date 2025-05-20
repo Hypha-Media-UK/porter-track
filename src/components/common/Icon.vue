@@ -23,91 +23,92 @@
   </span>
 </template>
 
-<script>
-export default {
-  name: 'Icon',
-  props: {
-    name: {
-      type: String,
-      required: true
-    },
-    size: {
-      type: [String, Number],
-      default: '1em'
-    },
-    type: {
-      type: String,
-      default: 'symbol',
-      validator: (value) => ['symbol', 'svg'].includes(value)
-    },
-    color: {
-      type: String,
-      default: 'currentColor'
-    }
+<script setup>
+import { computed } from 'vue'
+
+const props = defineProps({
+  name: {
+    type: String,
+    required: true
   },
-  computed: {
-    classes() {
-      return {
-        [`icon-${this.name}`]: true,
-        [`text-${this.color}`]: this.color !== 'currentColor'
-      };
-    },
-    svgPath() {
-      // This would map icon names to SVG path components
-      // For now we're using a simple approach with symbols
-      return null;
-    }
+  size: {
+    type: [String, Number],
+    default: '1em'
   },
-  methods: {
-    getIconSymbol() {
-      // Map icon names to HTML entities or Unicode characters
-      const iconMap = {
-        // Navigation icons
-        'home': '⌂',
-        'back': '←',
-        'forward': '→',
-        'settings': '⚙',
-        'menu': '☰',
-        'add': '+',
-        'remove': '−',
-        'close': '×',
-        'search': '🔍',
-        
-        // Action icons
-        'check': '✓',
-        'calendar': '📅',
-        'clock': '⏱',
-        'edit': '✎',
-        'delete': '🗑',
-        'save': '💾',
-        'download': '↓',
-        'upload': '↑',
-        'refresh': '↻',
-        
-        // Status icons
-        'info': 'ℹ',
-        'warning': '⚠',
-        'error': '⚠',
-        'success': '✓',
-        
-        // Content icons
-        'user': '👤',
-        'users': '👥',
-        'message': '💬',
-        'notification': '🔔',
-        'favorite': '★',
-        'heart': '♥',
-        'mail': '✉',
-        'phone': '📞',
-        'location': '📍',
-        'file': '📄',
-        'folder': '📁'
-      };
-      
-      return iconMap[this.name] || this.name;
-    }
+  type: {
+    type: String,
+    default: 'symbol',
+    validator: (value) => ['symbol', 'svg'].includes(value)
+  },
+  color: {
+    type: String,
+    default: 'currentColor'
   }
-};
+})
+
+const classes = computed(() => {
+  return {
+    [`icon-${props.name}`]: true,
+    [`text-${props.color}`]: props.color !== 'currentColor'
+  }
+})
+
+const svgPath = computed(() => {
+  // This would map icon names to SVG path components
+  // For now we're using a simple approach with symbols
+  return null
+})
+
+// Get the icon symbol based on name
+function getIconSymbol() {
+  // Map icon names to simple line-based symbols (Unicode)
+  const iconMap = {
+    // Navigation icons
+    'home': '⌂',
+    'back': '←',
+    'forward': '→',
+    'settings': '⚙',
+    'menu': '☰',
+    'add': '+',
+    'remove': '−',
+    'close': '×',
+    'search': '⚲',
+    
+    // Action icons
+    'check': '✓',
+    'calendar': '⎙',
+    'clock': '◷',
+    'edit': '✎',
+    'delete': '⌫',
+    'save': '↓',
+    'download': '↓',
+    'upload': '↑',
+    'refresh': '↻',
+    
+    // Status icons
+    'info': 'ⓘ',
+    'warning': '△',
+    'error': '✕',
+    'success': '✓',
+    
+    // Content icons
+    'user': '◯',
+    'users': '◯◯',
+    'message': '◱',
+    'notification': '◉',
+    'favorite': '☆',
+    'heart': '♡',
+    'mail': '✉',
+    'phone': '☏',
+    'location': '◎',
+    'file': '▣',
+    'folder': '▢',
+    'building': '⌷',
+    'department': '□'
+  }
+  
+  return iconMap[props.name] || props.name
+}
 </script>
 
 <style lang="scss" scoped>
@@ -119,5 +120,6 @@ export default {
   height: 1em;
   line-height: 0;
   vertical-align: middle;
+  font-style: normal;
 }
 </style>

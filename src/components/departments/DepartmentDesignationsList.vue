@@ -21,7 +21,7 @@
         
         <!-- Empty State -->
         <div v-else-if="!designations.length" class="empty-state py-4">
-          <span class="icon empty-state-icon">🏷️</span>
+          <Icon name="department" class="empty-state-icon" />
           <h3 class="empty-state-title">No Designations</h3>
           <p class="text-gray-600 mb-3">Department designations help classify porter assignments</p>
           <Button
@@ -85,6 +85,7 @@ import { useDepartmentDesignationsStore } from '../../stores/departmentDesignati
 import Card from '../common/Card.vue'
 import ListItem from '../common/ListItem.vue'
 import Button from '../common/Button.vue'
+import Icon from '../common/Icon.vue'
 import LoadingIndicator from '../common/LoadingIndicator.vue'
 import DialogConfirm from '../common/DialogConfirm.vue'
 import DepartmentDesignationForm from './DepartmentDesignationForm.vue'
