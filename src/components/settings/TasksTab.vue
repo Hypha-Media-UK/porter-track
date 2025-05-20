@@ -48,29 +48,14 @@
             icon-color="primary"
             :editable="true"
             :deletable="true"
+            :department-assignable="true"
+            :has-department="task.departments?.length > 0"
+            department-color="primary"
             placeholder="Task name"
             @update:model-value="updateTaskName(task.id, $event)"
             @delete="confirmDeleteTask(task)"
-          >
-            <!-- Department assignment button for task -->
-            <div class="d-flex align-center ml-2">
-              <v-badge
-                :content="task.departments?.length || 0"
-                :model-value="task.departments?.length > 0"
-                color="primary"
-                offset-x="8"
-                offset-y="8"
-              >
-                <v-btn
-                  icon="mdi-office-building-outline"
-                  size="small"
-                  variant="text"
-                  color="primary"
-                  @click.stop="openDepartmentAssignmentDialog(task)"
-                ></v-btn>
-              </v-badge>
-            </div>
-          </IOSListItem>
+            @assign-department="openDepartmentAssignmentDialog(task)"
+          />
         </div>
         
         <!-- Task Items List -->
@@ -85,29 +70,14 @@
               icon-color="secondary"
               :editable="true"
               :deletable="true"
+              :department-assignable="true"
+              :has-department="item.departments?.length > 0"
+              department-color="secondary"
               placeholder="Task item name"
               @update:model-value="updateTaskItemName(item.id, $event)"
               @delete="confirmDeleteTaskItem(item)"
-            >
-              <!-- Department assignment button for task item -->
-              <div class="d-flex align-center ml-2">
-                <v-badge
-                  :content="item.departments?.length || 0"
-                  :model-value="item.departments?.length > 0"
-                  color="secondary"
-                  offset-x="8"
-                  offset-y="8"
-                >
-                  <v-btn
-                    icon="mdi-office-building-outline"
-                    size="small"
-                    variant="text"
-                    color="secondary"
-                    @click.stop="openTaskItemDepartmentDialog(task, item)"
-                  ></v-btn>
-                </v-badge>
-              </div>
-            </IOSListItem>
+              @assign-department="openTaskItemDepartmentDialog(task, item)"
+            />
           </div>
           
           <!-- Empty Task Items State -->

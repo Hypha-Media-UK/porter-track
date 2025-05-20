@@ -20,6 +20,15 @@
       <div class="ios-list-item__actions">
         <slot name="actions">
           <v-btn 
+            v-if="departmentAssignable" 
+            icon="mdi-office-building-outline" 
+            density="comfortable" 
+            variant="text" 
+            size="small" 
+            :color="hasDepartment ? departmentColor : 'grey'"
+            @click.stop="$emit('assign-department')"
+          ></v-btn>
+          <v-btn 
             v-if="editable" 
             icon="mdi-pencil-outline" 
             density="comfortable" 
@@ -114,10 +123,22 @@ const props = defineProps({
   placeholder: {
     type: String,
     default: 'Enter text'
+  },
+  departmentAssignable: {
+    type: Boolean,
+    default: false
+  },
+  hasDepartment: {
+    type: Boolean,
+    default: false
+  },
+  departmentColor: {
+    type: String,
+    default: 'primary'
   }
 })
 
-const emit = defineEmits(['update:modelValue', 'delete', 'edit:start', 'edit:cancel', 'edit:save'])
+const emit = defineEmits(['update:modelValue', 'delete', 'edit:start', 'edit:cancel', 'edit:save', 'assign-department'])
 
 const isEditing = ref(false)
 const editValue = ref('')

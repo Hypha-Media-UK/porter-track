@@ -10,7 +10,7 @@
       </div>
       
       <div v-else>
-        <p class="mb-4">Select departments to assign to this task item:</p>
+        <p class="mb-4">Select a department to assign to this task item:</p>
         
         <v-expansion-panels variant="accordion">
           <v-expansion-panel
@@ -20,16 +20,17 @@
           >
             <v-expansion-panel-title>{{ building.name }}</v-expansion-panel-title>
             <v-expansion-panel-text>
-              <v-checkbox
-                v-for="dept in building.departments"
-                :key="dept.id"
-                v-model="selectedDepartmentIds"
-                :value="dept.id"
-                :label="dept.name"
-                color="primary"
-                hide-details
-                class="mb-2"
-              ></v-checkbox>
+              <v-radio-group v-model="selectedDepartmentId">
+                <v-radio
+                  v-for="dept in building.departments"
+                  :key="dept.id"
+                  :value="dept.id"
+                  :label="dept.name"
+                  color="primary"
+                  hide-details
+                  class="mb-2"
+                ></v-radio>
+              </v-radio-group>
             </v-expansion-panel-text>
           </v-expansion-panel>
         </v-expansion-panels>
@@ -80,17 +81,22 @@ const props = defineProps({
 
 const emit = defineEmits(['save', 'cancel'])
 
-const selectedDepartmentIds = ref([])
+const selectedDepartmentId = ref(null)
 
 onMounted(() => {
-  // Initialize with the selected departments
-  selectedDepartmentIds.value = props.selectedDepartments.map(dept => dept.id || dept)
+  // Initialize with the first selected department if any exists
+  if (props.selectedDepartments && props.selectedDepartments.length > 0) {
+    selectedDepartmentId.value = props.selectedDepartments[0].id || props.selectedDepartments[0]
+  }
 })
 
 const save = () => {
+  // Create an array with a single department ID (or empty if none selected)
+  const departmentIds = selectedDepartmentId.value ? [selectedDepartmentId.value] : []
+  
   emit('save', {
     taskItemId: props.taskItemId,
-    departmentIds: selectedDepartmentIds.value
+    departmentIds: departmentIds
   })
 }
 </script>
