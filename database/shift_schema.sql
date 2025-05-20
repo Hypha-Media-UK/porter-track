@@ -76,6 +76,14 @@ CREATE INDEX IF NOT EXISTS shift_tasks_porter_id_idx ON shift_tasks(porter_id);
 CREATE INDEX IF NOT EXISTS shift_tasks_status_idx ON shift_tasks(status);
 
 -- Triggers to automatically update the updated_at column
+-- Drop existing triggers first to avoid conflicts
+DROP TRIGGER IF EXISTS update_department_designations_updated_at ON department_designations;
+DROP TRIGGER IF EXISTS update_shifts_updated_at ON shifts;
+DROP TRIGGER IF EXISTS update_shift_porters_updated_at ON shift_porters;
+DROP TRIGGER IF EXISTS update_porter_department_assignments_updated_at ON porter_department_assignments;
+DROP TRIGGER IF EXISTS update_shift_tasks_updated_at ON shift_tasks;
+
+-- Create triggers
 CREATE TRIGGER update_department_designations_updated_at
 BEFORE UPDATE ON department_designations
 FOR EACH ROW
