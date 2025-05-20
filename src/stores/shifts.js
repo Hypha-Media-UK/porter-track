@@ -327,18 +327,29 @@ export const useShiftsStore = defineStore('shifts', () => {
         .eq('porter_id', assignment.porterId)
         .eq('is_active', true)
       
+      // Prepare assignment data object
+      const assignmentData = {
+        shift_id: assignment.shiftId,
+        porter_id: assignment.porterId,
+        designation_id: assignment.designationId || null,
+        start_time: assignment.startTime || new Date(),
+        end_time: assignment.endTime,
+        is_active: true
+      }
+      
+      // Handle department_id (we're not sending it anymore since we removed the field)
+      // Only include department_id if we're editing and it exists in the original data
+      if (assignment.departmentId) {
+        assignmentData.department_id = assignment.departmentId
+      } else {
+        // Set department_id to null if not provided (required by the database schema)
+        assignmentData.department_id = null
+      }
+      
       // Then create the new assignment
       const { data, error: err } = await supabase
         .from('porter_department_assignments')
-        .insert([{
-          shift_id: assignment.shiftId,
-          porter_id: assignment.porterId,
-          department_id: assignment.departmentId,
-          designation_id: assignment.designationId,
-          start_time: assignment.startTime || new Date(),
-          end_time: assignment.endTime,
-          is_active: true
-        }])
+        .insert([assignmentData])
         .select()
       
       if (err) throw err

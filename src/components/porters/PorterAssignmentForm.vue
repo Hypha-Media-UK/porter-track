@@ -7,7 +7,7 @@
   >
     <v-card class="ios-dialog">
       <v-card-title class="text-h5">
-        {{ isEdit ? 'Reassign Porter' : 'Assign Porter to Department' }}
+        {{ isEdit ? 'Update Porter Assignment' : 'Assign Porter Designation' }}
       </v-card-title>
       
       <v-card-text>
@@ -27,31 +27,7 @@
             </div>
           </div>
           
-          <!-- Department Selection -->
-          <v-autocomplete
-            v-model="form.departmentId"
-            :items="departments"
-            item-title="name"
-            item-value="id"
-            label="Department"
-            variant="outlined"
-            density="comfortable"
-            :error-messages="errors.department"
-            required
-            class="mb-4"
-            @update:model-value="errors.department = ''"
-          >
-            <template #item="{ item, props }">
-              <v-list-item v-bind="props" :title="item.name">
-                <template #prepend>
-                  <v-icon icon="mdi-office-building"></v-icon>
-                </template>
-                <template #subtitle>
-                  <span v-if="item.building?.name">{{ item.building.name }}</span>
-                </template>
-              </v-list-item>
-            </template>
-          </v-autocomplete>
+          <!-- Department field removed as requested -->
           
           <!-- Designation Selection -->
           <v-autocomplete
@@ -85,7 +61,7 @@
           <div class="time-fields">
             <TimeInput
               v-model="form.startTime"
-              label="Start Time"
+              label="Start Time (Optional)"
               :error="errors.startTime"
               class="mb-2"
             />
@@ -110,7 +86,7 @@
         </IOSButton>
         <IOSButton
           color="primary"
-          :disabled="!form.departmentId || !form.startTime"
+          :disabled="isLoading"
           @click="submitForm"
         >
           Assign
@@ -166,14 +142,12 @@ const isVisible = computed({
 const form = ref({
   shiftId: props.shiftId,
   porterId: props.porter?.id || '',
-  departmentId: '',
   designationId: '',
   startTime: new Date(),
   endTime: null
 })
 
 const errors = ref({
-  department: '',
   startTime: ''
 })
 
@@ -243,14 +217,12 @@ const resetForm = () => {
   form.value = {
     shiftId: props.shiftId,
     porterId: props.porter?.id || '',
-    departmentId: '',
     designationId: '',
     startTime: new Date(),
     endTime: null
   }
   
   errors.value = {
-    department: '',
     startTime: ''
   }
 }
@@ -258,15 +230,9 @@ const resetForm = () => {
 const validateForm = () => {
   let isValid = true
   
-  if (!form.value.departmentId) {
-    errors.value.department = 'Department is required'
-    isValid = false
-  }
+  // Department validation removed as the field is no longer present
   
-  if (!form.value.startTime) {
-    errors.value.startTime = 'Start time is required'
-    isValid = false
-  }
+  // Start time is now optional, so no validation needed
   
   return isValid
 }

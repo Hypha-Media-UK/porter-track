@@ -16,32 +16,7 @@
         </div>
       </div>
       
-      <!-- Department Selection -->
-      <v-autocomplete
-        v-model="form.departmentId"
-        :items="departments"
-        item-title="name"
-        item-value="id"
-        label="Department"
-        variant="outlined"
-        density="comfortable"
-        :error-messages="errors.department"
-        :loading="isLoading"
-        required
-        class="mb-4"
-        @update:model-value="errors.department = ''"
-      >
-        <template #item="{ item, props }">
-          <v-list-item v-bind="props" :title="item.name">
-            <template #prepend>
-              <v-icon icon="mdi-office-building"></v-icon>
-            </template>
-            <template #subtitle>
-              <span v-if="item.building?.name">{{ item.building.name }}</span>
-            </template>
-          </v-list-item>
-        </template>
-      </v-autocomplete>
+      <!-- Department field removed as requested -->
       
   <!-- Designation Selection -->
   <v-autocomplete
@@ -87,7 +62,7 @@
       </IOSButton>
     <IOSButton
       color="primary"
-      :disabled="!form.departmentId || !form.designationId || isLoading"
+      :disabled="!form.designationId || isLoading"
       @click="submitForm"
     >
       Assign
@@ -98,7 +73,10 @@
 
 <script setup>
 import { ref, computed } from 'vue'
+import { useRoute } from 'vue-router'
 import IOSButton from '../common/IOSButton.vue'
+
+const route = useRoute()
 
 const props = defineProps({
   porter: {
@@ -116,18 +94,20 @@ const props = defineProps({
   isLoading: {
     type: Boolean,
     default: false
+  },
+  shiftId: {
+    type: String,
+    required: true
   }
 })
 
 const emit = defineEmits(['submit', 'cancel'])
 
 const form = ref({
-  departmentId: '',
   designationId: ''
 })
 
 const errors = ref({
-  department: '',
   designation: ''
 })
 
@@ -137,6 +117,7 @@ const submitForm = () => {
   
   emit('submit', {
     porterId: props.porter.id,
+    shiftId: props.shiftId,  // Use the prop directly
     ...form.value
   })
 }
@@ -144,10 +125,7 @@ const submitForm = () => {
 const validateForm = () => {
   let isValid = true
   
-  if (!form.value.departmentId) {
-    errors.value.department = 'Department is required'
-    isValid = false
-  }
+  // Department validation removed as the field is no longer present
   
   if (!form.value.designationId) {
     errors.value.designation = 'Designation is required'

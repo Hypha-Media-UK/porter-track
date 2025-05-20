@@ -195,6 +195,7 @@
             :departments="buildingsStore.departments"
             :designations="designationsStore.designations"
             :is-loading="isLoadingPorters"
+            :shift-id="shiftId"
             @submit="assignPorterToDepartment"
             @cancel="departmentSelectDialogVisible = false"
           />
