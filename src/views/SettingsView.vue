@@ -1,51 +1,46 @@
 <template>
-  <div class="settings-container">
+  <div class="ios-settings-view">
     <!-- Page Header -->
-    <header class="mb-4">
-      <h1 class="text-h4 font-weight-medium mb-1">Settings</h1>
-      <p class="text-subtitle-1 text-medium-emphasis">Configure Porter Track</p>
+    <header class="ios-settings-view__header">
+      <h1 class="text-h4 font-weight-medium">Settings</h1>
     </header>
 
     <!-- Tab Navigation -->
-    <v-tabs
-      v-model="currentTab"
-      color="primary"
-      align-tabs="center"
-      class="mb-6"
-      grow
-    >
-      <v-tab value="buildings" class="text-subtitle-1" prepend-icon="mdi-office-building-outline">
-        Buildings
-      </v-tab>
-      <v-tab value="tasks" class="text-subtitle-1" prepend-icon="mdi-clipboard-text-outline">
-        Tasks
-      </v-tab>
-      <v-tab value="app" class="text-subtitle-1" prepend-icon="mdi-cog-outline">
-        App Settings
-      </v-tab>
-    </v-tabs>
+    <div class="ios-settings-view__tabs">
+      <v-tabs
+        v-model="currentTab"
+        color="primary"
+        centered
+        show-arrows
+        class="mb-6 ios-tabs"
+      >
+        <v-tab value="buildings" class="ios-tab">
+          <v-icon icon="mdi-office-building-outline" class="mr-2"></v-icon>
+          Buildings
+        </v-tab>
+        <v-tab value="tasks" class="ios-tab">
+          <v-icon icon="mdi-clipboard-text-outline" class="mr-2"></v-icon>
+          Tasks
+        </v-tab>
+        <v-tab value="app" class="ios-tab">
+          <v-icon icon="mdi-cog-outline" class="mr-2"></v-icon>
+          App Settings
+        </v-tab>
+      </v-tabs>
+    </div>
 
     <!-- Tab Contents -->
-    <v-window v-model="currentTab" class="settings-content">
-      <!-- Buildings Tab Content -->
+    <v-window v-model="currentTab" class="ios-settings-view__content">
       <v-window-item value="buildings">
-        <div class="tab-content">
-          <BuildingsTab />
-        </div>
+        <BuildingsTab />
       </v-window-item>
       
-      <!-- Tasks Tab Content -->
       <v-window-item value="tasks">
-        <div class="tab-content">
-          <TasksTab />
-        </div>
+        <TasksTab />
       </v-window-item>
       
-      <!-- App Settings Tab Content -->
       <v-window-item value="app">
-        <div class="tab-content">
-          <AppSettingsTab />
-        </div>
+        <AppSettingsTab />
       </v-window-item>
     </v-window>
   </div>
@@ -94,20 +89,48 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.settings-container {
+.ios-settings-view {
   max-width: 1200px;
   margin: 0 auto;
   padding: 16px;
+  height: 100%;
 }
 
-.tab-content {
+.ios-settings-view__header {
+  padding: 16px 0;
+  text-align: center;
+}
+
+.ios-tabs {
+  border-radius: 10px;
+  background-color: rgba(0, 0, 0, 0.03);
+  padding: 4px;
+}
+
+.ios-tab {
+  border-radius: 8px;
+  min-width: 120px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.ios-settings-view__content {
   min-height: 400px;
 }
 
-/* Add some tablet/desktop-specific styling */
+@media (prefers-color-scheme: dark) {
+  .ios-tabs {
+    background-color: rgba(255, 255, 255, 0.05);
+  }
+}
+
 @media (min-width: 768px) {
-  .settings-container {
+  .ios-settings-view {
     padding: 24px;
+  }
+  
+  .ios-settings-view__header {
+    padding: 24px 0;
   }
 }
 </style>

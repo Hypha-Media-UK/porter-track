@@ -1,276 +1,320 @@
 <template>
-  <section>
-    <!-- Header with Action Button -->
-    <div class="d-flex justify-space-between align-center mb-6">
+  <section class="tasks-tab">
+    <!-- Header and Actions -->
+    <div class="tasks-tab__header mb-4">
       <div>
-        <h2 class="text-h5 font-weight-medium">Tasks Management</h2>
+        <h1 class="text-h4 font-weight-medium mb-1">Tasks</h1>
         <p class="text-body-1 text-medium-emphasis">Manage tasks and task items</p>
       </div>
-      <v-btn color="primary" prepend-icon="mdi-plus" @click="openTaskDialog()">
-        Add Task
-      </v-btn>
-    </div>
-
-    <!-- Loading State -->
-    <LoadingIndicator :show="tasksStore.isLoading" message="Loading tasks..." />
-
-    <!-- Empty State -->
-    <EmptyState
-      v-if="!tasksStore.isLoading && !tasksStore.tasks.length"
-      icon="mdi-clipboard-text-outline"
-      message="No tasks found. Add your first task to get started."
-      actionText="Add Task"
-      actionIcon="mdi-plus"
-      @action="openTaskDialog()"
-    />
-
-    <!-- Tasks List -->
-    <v-expansion-panels
-      v-else-if="!tasksStore.isLoading"
-      multiple
-      variant="accordion"
-    >
-      <v-expansion-panel
-        v-for="task in tasksStore.tasks"
-        :key="task.id"
-        class="mb-4"
+      <IOSButton 
+        color="primary" 
+        prependIcon="mdi-plus"
+        @click="addTask"
       >
-        <v-expansion-panel-title>
-          <div class="d-flex align-center">
-            <v-icon class="mr-2" icon="mdi-clipboard-text-outline"></v-icon>
-            <span>{{ task.name }}</span>
-          </div>
-        </v-expansion-panel-title>
+        Add Task
+      </IOSButton>
+    </div>
+    
+    <!-- Loading Indicator -->
+    <div v-if="tasksStore.isLoading" class="text-center py-6">
+      <v-progress-circular indeterminate color="primary"></v-progress-circular>
+      <p class="mt-2 text-medium-emphasis">Loading tasks...</p>
+    </div>
+    
+    <!-- Empty State -->
+    <IOSCard v-else-if="!tasksStore.tasks.length">
+      <div class="text-center py-8">
+        <v-icon icon="mdi-clipboard-text-outline" size="x-large" color="secondary" class="mb-4"></v-icon>
+        <h3 class="text-h5 mb-2">No tasks yet</h3>
+        <p class="mb-4">Add your first task to get started</p>
+        <IOSButton color="primary" prependIcon="mdi-plus" @click="addTask">
+          Add Task
+        </IOSButton>
+      </div>
+    </IOSCard>
+    
+    <!-- Tasks List -->
+    <div v-else class="tasks-list">
+      <IOSCard 
+        v-for="task in tasksStore.tasks" 
+        :key="task.id"
+        class="task-card"
+      >
+        <!-- Task Header -->
+        <div class="ios-card-header">
+          <IOSListItem
+            :model-value="task.name"
+            icon="mdi-clipboard-text-outline"
+            icon-color="primary"
+            :editable="true"
+            :deletable="true"
+            placeholder="Task name"
+            @update:model-value="updateTaskName(task.id, $event)"
+            @delete="confirmDeleteTask(task)"
+          />
+        </div>
         
-        <v-expansion-panel-text>
-          <!-- Task Details -->
-          <div class="mb-4">
-            <p v-if="task.description">{{ task.description }}</p>
-            <p v-if="task.estimated_duration" class="d-flex align-center">
-              <v-icon small class="mr-1">mdi-clock-outline</v-icon>
-              Estimated time: {{ task.estimated_duration }} minutes
-            </p>
+        <!-- Task Items List -->
+        <div class="inset-content">
+          <!-- Task Item Items -->
+          <div v-if="task.taskItems && task.taskItems.length">
+            <IOSListItem
+              v-for="item in task.taskItems"
+              :key="item.id"
+              :model-value="item.name"
+              icon="mdi-checkbox-marked-circle-outline"
+              icon-color="secondary"
+              :editable="true"
+              :deletable="true"
+              placeholder="Task item name"
+              @update:model-value="updateTaskItemName(item.id, $event)"
+              @delete="confirmDeleteTaskItem(item)"
+            />
           </div>
           
-          <!-- Task Actions -->
-          <div class="d-flex mb-4 justify-end">
-            <v-btn
+          <!-- Empty Task Items State -->
+          <div v-else class="text-center py-4">
+            <p class="text-medium-emphasis mb-2">No task items</p>
+          </div>
+          
+          <!-- Add Task Item Button -->
+          <div class="px-4 pb-3 pt-2 text-center">
+            <IOSButton
               variant="text"
-              color="primary"
-              class="mr-2"
-              prepend-icon="mdi-pencil-outline"
-              @click.stop="openTaskDialog(task)"
-            >
-              Edit
-            </v-btn>
-            <v-btn
-              variant="text"
-              color="error"
-              class="mr-2"
-              prepend-icon="mdi-delete-outline"
-              @click.stop="confirmDeleteTask(task)"
-            >
-              Delete
-            </v-btn>
-            <v-btn
-              variant="text"
-              color="primary"
-              class="mr-2"
-              prepend-icon="mdi-plus"
-              @click.stop="openTaskItemDialog(task)"
+              size="small"
+              prependIcon="mdi-plus"
+              @click="addTaskItem(task)"
             >
               Add Task Item
-            </v-btn>
-            <v-btn
+            </IOSButton>
+          </div>
+        </div>
+        
+        <!-- Department Associations -->
+        <div class="ios-card-content task-departments">
+          <!-- Department Assignment Button -->
+          <div class="d-flex justify-space-between align-center mt-1">
+            <div>
+              <h3 class="text-subtitle-1 font-weight-medium">Assigned Departments</h3>
+              <p v-if="task.departments && task.departments.length" class="text-caption text-secondary">
+                {{ task.departments.length }} department{{ task.departments.length !== 1 ? 's' : '' }} assigned
+              </p>
+              <p v-else class="text-caption text-secondary">Not assigned to any departments</p>
+            </div>
+            <IOSButton
               variant="text"
-              color="secondary"
-              prepend-icon="mdi-office-building-outline"
-              @click.stop="openDepartmentAssociationDialog(task)"
+              size="small"
+              prependIcon="mdi-office-building-outline"
+              @click="openDepartmentAssignmentDialog(task)"
             >
-              Assign Departments
-            </v-btn>
+              Assign
+            </IOSButton>
           </div>
-          
-          <!-- Task Items Section -->
-          <div class="task-section mb-4">
-            <h3 class="text-h6 mb-3">Task Items</h3>
-            
-            <v-list v-if="task.taskItems && task.taskItems.length">
-              <v-list-item
-                v-for="item in task.taskItems"
-                :key="item.id"
-                class="mb-2 rounded-lg"
-              >
-                <template v-slot:prepend>
-                  <v-icon icon="mdi-checkbox-marked-circle-outline"></v-icon>
-                </template>
-                
-                <v-list-item-title>{{ item.name }}</v-list-item-title>
-                <v-list-item-subtitle v-if="item.description">
-                  {{ item.description }}
-                </v-list-item-subtitle>
-                
-                <template v-slot:append>
-                  <v-btn icon="mdi-pencil-outline" variant="text" size="small" @click.stop="openTaskItemDialog(task, item)"></v-btn>
-                  <v-btn icon="mdi-delete-outline" variant="text" size="small" color="error" @click.stop="confirmDeleteTaskItem(item)"></v-btn>
-                </template>
-              </v-list-item>
-            </v-list>
-            
-            <!-- Empty Task Items State -->
-            <EmptyState
-              v-else
-              icon="mdi-checkbox-marked-circle-outline"
-              message="No task items for this task. Add your first task item."
-              actionText="Add Task Item"
-              actionIcon="mdi-plus"
-              @action="openTaskItemDialog(task)"
-            />
-          </div>
-          
-          <!-- Department Associations Section -->
-          <div class="task-section">
-            <h3 class="text-h6 mb-3">Assigned Departments</h3>
-            
-            <v-list v-if="task.departments && task.departments.length">
-              <v-list-item
-                v-for="dept in task.departments"
-                :key="dept.id"
-                class="mb-2 rounded-lg"
-              >
-                <template v-slot:prepend>
-                  <v-icon icon="mdi-office-building-outline"></v-icon>
-                </template>
-                
-                <v-list-item-title>{{ dept.name }}</v-list-item-title>
-                <v-list-item-subtitle>
-                  {{ getBuildingName(dept.building_id) }}
-                </v-list-item-subtitle>
-              </v-list-item>
-            </v-list>
-            
-            <!-- Empty Departments State -->
-            <EmptyState
-              v-else
-              icon="mdi-office-building-outline"
-              message="This task is not assigned to any departments."
-              actionText="Assign Departments"
-              actionIcon="mdi-office-building-outline"
-              @action="openDepartmentAssociationDialog(task)"
-            />
-          </div>
-        </v-expansion-panel-text>
-      </v-expansion-panel>
-    </v-expansion-panels>
-
-    <!-- Task Dialog -->
-    <v-dialog v-model="taskDialogVisible" max-width="500">
-      <TaskForm
-        :task="currentTask"
-        :isEdit="editMode"
-        @save="saveTask"
-        @cancel="taskDialogVisible = false"
-      />
-    </v-dialog>
-    
-    <!-- Task Item Dialog -->
-    <v-dialog v-model="taskItemDialogVisible" max-width="500">
-      <TaskItemForm
-        :taskItem="currentTaskItem"
-        :taskId="currentTask?.id"
-        :orderIndex="currentTask?.taskItems?.length || 0"
-        :isEdit="editMode"
-        @save="saveTaskItem"
-        @cancel="taskItemDialogVisible = false"
-      />
-    </v-dialog>
-    
-    <!-- Department Association Dialog -->
-    <v-dialog v-model="departmentAssociationDialogVisible" max-width="600">
-      <DepartmentAssociationForm
-        :taskId="currentTask?.id"
-        :taskName="currentTask?.name"
-        :buildings="buildingsStore.buildings"
-        :selectedDepartments="selectedDepartments"
-        @save="saveDepartmentAssociations"
-        @cancel="departmentAssociationDialogVisible = false"
-      />
-    </v-dialog>
+        </div>
+      </IOSCard>
+    </div>
     
     <!-- Delete Confirmation Dialog -->
-    <DialogConfirm
-      v-model="deleteDialogVisible"
-      :title="`Confirm Deletion`"
-      :message="`Are you sure you want to delete this ${deleteType}? This action cannot be undone.`"
-      confirm-text="Delete"
-      confirm-color="error"
-      @confirm="confirmDelete"
-    />
+    <v-dialog v-model="deleteDialogVisible" max-width="400" persistent>
+      <v-card class="ios-dialog">
+        <v-card-title class="text-h5">Confirm Deletion</v-card-title>
+        <v-card-text>
+          Are you sure you want to delete this {{ deleteType }}? This action cannot be undone.
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <IOSButton
+            color="secondary"
+            variant="text"
+            @click="deleteDialogVisible = false"
+          >
+            Cancel
+          </IOSButton>
+          <IOSButton
+            color="error"
+            @click="confirmDelete"
+          >
+            Delete
+          </IOSButton>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    
+    <!-- New Task Dialog -->
+    <v-dialog v-model="taskDialogVisible" max-width="400" persistent>
+      <v-card class="ios-dialog">
+        <v-card-title class="text-h5">Add Task</v-card-title>
+        <v-card-text>
+          <v-text-field
+            v-model="newTask.name"
+            label="Task Name"
+            variant="outlined"
+            autofocus
+            @keyup.enter="saveNewTask"
+          ></v-text-field>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <IOSButton
+            color="secondary"
+            variant="text"
+            @click="taskDialogVisible = false"
+          >
+            Cancel
+          </IOSButton>
+          <IOSButton
+            color="primary"
+            :disabled="!newTask.name"
+            @click="saveNewTask"
+          >
+            Add
+          </IOSButton>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    
+    <!-- New Task Item Dialog -->
+    <v-dialog v-model="taskItemDialogVisible" max-width="400" persistent>
+      <v-card class="ios-dialog">
+        <v-card-title class="text-h5">Add Task Item</v-card-title>
+        <v-card-text>
+          <v-text-field
+            v-model="newTaskItem.name"
+            label="Task Item Name"
+            variant="outlined"
+            autofocus
+            @keyup.enter="saveNewTaskItem"
+          ></v-text-field>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <IOSButton
+            color="secondary"
+            variant="text"
+            @click="taskItemDialogVisible = false"
+          >
+            Cancel
+          </IOSButton>
+          <IOSButton
+            color="primary"
+            :disabled="!newTaskItem.name"
+            @click="saveNewTaskItem"
+          >
+            Add
+          </IOSButton>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    
+    <!-- Department Assignment Dialog -->
+    <v-dialog v-model="departmentAssignDialogVisible" max-width="500" persistent>
+      <v-card class="ios-dialog">
+        <v-card-title class="text-h5">Assign to Departments</v-card-title>
+        <v-card-text>
+          <div v-if="!buildingsStore.buildings.length" class="text-center py-4">
+            <p>No departments available. Please add buildings and departments first.</p>
+          </div>
+          <div v-else>
+            <p class="mb-4">Select departments to assign to this task:</p>
+            
+            <v-expansion-panels variant="accordion">
+              <v-expansion-panel
+                v-for="building in buildingsStore.buildings"
+                :key="building.id"
+                rounded
+              >
+                <v-expansion-panel-title>{{ building.name }}</v-expansion-panel-title>
+                <v-expansion-panel-text>
+                  <v-checkbox
+                    v-for="dept in building.departments"
+                    :key="dept.id"
+                    v-model="selectedDepartments"
+                    :value="dept.id"
+                    :label="dept.name"
+                    color="primary"
+                    hide-details
+                    class="mb-2"
+                  ></v-checkbox>
+                </v-expansion-panel-text>
+              </v-expansion-panel>
+            </v-expansion-panels>
+          </div>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <IOSButton
+            color="secondary"
+            variant="text"
+            @click="departmentAssignDialogVisible = false"
+          >
+            Cancel
+          </IOSButton>
+          <IOSButton
+            color="primary"
+            @click="saveDepartmentAssignments"
+          >
+            Save
+          </IOSButton>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </section>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useTasksStore } from '../../stores/tasks'
 import { useBuildingsStore } from '../../stores/buildings'
-import TaskForm from '../tasks/TaskForm.vue'
-import TaskItemForm from '../task-items/TaskItemForm.vue'
-import DepartmentAssociationForm from '../tasks/DepartmentAssociationForm.vue'
-import DialogConfirm from '../common/DialogConfirm.vue'
-import LoadingIndicator from '../common/LoadingIndicator.vue'
-import EmptyState from '../common/EmptyState.vue'
+import IOSCard from '../common/IOSCard.vue'
+import IOSListItem from '../common/IOSListItem.vue'
+import IOSButton from '../common/IOSButton.vue'
 
 // Stores
 const tasksStore = useTasksStore()
 const buildingsStore = useBuildingsStore()
 
-// Local state
+// State for dialogs and editing
+const deleteDialogVisible = ref(false)
 const taskDialogVisible = ref(false)
 const taskItemDialogVisible = ref(false)
-const deleteDialogVisible = ref(false)
-const departmentAssociationDialogVisible = ref(false)
-const editMode = ref(false)
+const departmentAssignDialogVisible = ref(false)
 const deleteType = ref('item')
-const currentTask = ref(null)
-const currentTaskItem = ref(null)
 const itemToDelete = ref(null)
+const newTask = ref({ name: '' })
+const newTaskItem = ref({ name: '', task_id: null })
+const currentTask = ref(null)
 const selectedDepartments = ref([])
 
 // Fetch data
-Promise.all([tasksStore.fetchTasks(), buildingsStore.fetchBuildings()])
+onMounted(async () => {
+  await Promise.all([
+    tasksStore.fetchTasks(),
+    buildingsStore.fetchBuildings()
+  ])
+})
 
-// Helper function to get building name
-const getBuildingName = (buildingId) => {
-  const building = buildingsStore.getBuildingById(buildingId)
-  return building ? building.name : 'Unknown Building'
-}
-
-// Task dialog operations
-const openTaskDialog = (task = null) => {
-  if (task) {
-    editMode.value = true
-    currentTask.value = { ...task }
-  } else {
-    editMode.value = false
-    currentTask.value = { 
-      name: '',
-      description: '',
-      estimated_duration: null
-    }
-  }
+// Task operations
+const addTask = () => {
+  newTask.value = { name: '' }
   taskDialogVisible.value = true
 }
 
-const saveTask = async (task) => {
-  try {
-    if (editMode.value) {
-      await tasksStore.updateTask(task)
-    } else {
-      await tasksStore.createTask(task)
+const saveNewTask = async () => {
+  if (newTask.value.name.trim()) {
+    try {
+      await tasksStore.createTask(newTask.value)
+      taskDialogVisible.value = false
+    } catch (error) {
+      console.error('Error creating task:', error)
     }
-    taskDialogVisible.value = false
+  }
+}
+
+const updateTaskName = async (id, newName) => {
+  try {
+    await tasksStore.updateTask({ id, name: newName })
   } catch (error) {
-    console.error('Error saving task:', error)
+    console.error('Error updating task:', error)
   }
 }
 
@@ -280,36 +324,33 @@ const confirmDeleteTask = (task) => {
   deleteDialogVisible.value = true
 }
 
-// Task Item dialog operations
-const openTaskItemDialog = (task, taskItem = null) => {
-  currentTask.value = task
-  
-  if (taskItem) {
-    editMode.value = true
-    currentTaskItem.value = { ...taskItem }
-  } else {
-    editMode.value = false
-    currentTaskItem.value = { 
-      name: '',
-      description: '',
-      task_id: task.id,
-      order_index: task.taskItems ? task.taskItems.length : 0
-    }
+// Task Item operations
+const addTaskItem = (task) => {
+  newTaskItem.value = { 
+    name: '',
+    task_id: task.id,
+    order_index: task.taskItems ? task.taskItems.length : 0
   }
-  
+  currentTask.value = task
   taskItemDialogVisible.value = true
 }
 
-const saveTaskItem = async (taskItem) => {
-  try {
-    if (editMode.value) {
-      await tasksStore.updateTaskItem(taskItem)
-    } else {
-      await tasksStore.createTaskItem(taskItem)
+const saveNewTaskItem = async () => {
+  if (newTaskItem.value.name.trim()) {
+    try {
+      await tasksStore.createTaskItem(newTaskItem.value)
+      taskItemDialogVisible.value = false
+    } catch (error) {
+      console.error('Error creating task item:', error)
     }
-    taskItemDialogVisible.value = false
+  }
+}
+
+const updateTaskItemName = async (id, newName) => {
+  try {
+    await tasksStore.updateTaskItem({ id, name: newName })
   } catch (error) {
-    console.error('Error saving task item:', error)
+    console.error('Error updating task item:', error)
   }
 }
 
@@ -319,24 +360,21 @@ const confirmDeleteTaskItem = (taskItem) => {
   deleteDialogVisible.value = true
 }
 
-// Department association operations
-const openDepartmentAssociationDialog = (task) => {
+// Department assignment operations
+const openDepartmentAssignmentDialog = (task) => {
   currentTask.value = task
-  
-  // Reset and pre-select already associated departments
   selectedDepartments.value = task.departments 
     ? task.departments.map(dept => dept.id) 
     : []
-    
-  departmentAssociationDialogVisible.value = true
+  departmentAssignDialogVisible.value = true
 }
 
-const saveDepartmentAssociations = async (data) => {
+const saveDepartmentAssignments = async () => {
   try {
-    await tasksStore.updateTaskDepartments(data.taskId, data.departmentIds)
-    departmentAssociationDialogVisible.value = false
+    await tasksStore.updateTaskDepartments(currentTask.value.id, selectedDepartments.value)
+    departmentAssignDialogVisible.value = false
   } catch (error) {
-    console.error('Error saving department associations:', error)
+    console.error('Error updating department assignments:', error)
   }
 }
 
@@ -348,6 +386,7 @@ const confirmDelete = async () => {
     } else if (deleteType.value === 'task item') {
       await tasksStore.deleteTaskItem(itemToDelete.value.id)
     }
+    deleteDialogVisible.value = false
   } catch (error) {
     console.error(`Error deleting ${deleteType.value}:`, error)
   }
@@ -355,8 +394,52 @@ const confirmDelete = async () => {
 </script>
 
 <style scoped>
-.task-section {
-  border-top: 1px solid rgba(0, 0, 0, 0.12);
-  padding-top: 16px;
+.tasks-tab {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.tasks-tab__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.task-departments {
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.ios-dialog {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+@media (prefers-color-scheme: dark) {
+  .ios-dialog {
+    background-color: #2C2C2E;
+  }
+  
+  .task-departments {
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+}
+
+@media (max-width: 600px) {
+  .tasks-tab__header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  
+  .tasks-tab__header > div:first-child {
+    margin-bottom: 8px;
+  }
 }
 </style>

@@ -12,55 +12,75 @@ const vuetify = createVuetify({
     themes: {
       light: {
         colors: {
-          primary: '#2563EB',    // Modern blue
-          secondary: '#0D9488',  // Teal
-          accent: '#8B5CF6',     // Purple
-          error: '#EF4444',      // Modern red
-          info: '#3B82F6',       // Light blue
-          success: '#10B981',    // Green
-          warning: '#F59E0B',    // Amber
-          background: '#F9FAFB', // Light gray background
+          // iOS-inspired colors
+          primary: '#007AFF',      // iOS blue
+          secondary: '#8E8E93',    // iOS gray
+          error: '#FF3B30',        // iOS red
+          info: '#5AC8FA',         // iOS light blue
+          success: '#34C759',      // iOS green
+          warning: '#FF9500',      // iOS orange
+          background: '#F2F2F7',   // iOS light gray background
+          surface: '#FFFFFF',      // White
         },
       },
       dark: {
         colors: {
-          primary: '#3B82F6',    // Lighter blue for dark mode
-          secondary: '#14B8A6',  // Lighter teal for dark mode
-          accent: '#A78BFA',     // Lighter purple for dark mode
-          error: '#F87171',      // Light red
-          info: '#60A5FA',       // Very light blue
-          success: '#34D399',    // Light green
-          warning: '#FBBF24',    // Light amber
-          background: '#1F2937', // Dark background
+          // iOS dark mode colors
+          primary: '#0A84FF',      // iOS blue (dark mode)
+          secondary: '#98989D',    // iOS gray (dark mode)
+          error: '#FF453A',        // iOS red (dark mode)
+          info: '#64D2FF',         // iOS light blue (dark mode)
+          success: '#30D158',      // iOS green (dark mode)
+          warning: '#FF9F0A',      // iOS orange (dark mode)
+          background: '#1C1C1E',   // iOS dark background
+          surface: '#2C2C2E',      // iOS dark surface
         },
       },
     },
   },
-  display: {
-    mobileBreakpoint: 'sm',
-  },
-  // Defaults for components to reduce nesting
   defaults: {
+    // iOS-inspired default component styles
     VCard: {
-      flat: true,
-      elevation: 2,
-      rounded: 'lg',
+      elevation: 0,           // Flat design
+      rounded: 'lg',          // Rounded corners
+      class: 'ios-card',      // Custom class for additional styling
     },
     VBtn: {
-      variant: 'elevated',
-      rounded: 'pill',
+      variant: 'tonal',       // Subtle styling
+      rounded: 'pill',        // Rounded buttons
     },
     VTextField: {
       variant: 'outlined',
       density: 'comfortable',
-    },
-    VSelect: {
-      variant: 'outlined',
-      density: 'comfortable',
+      color: 'primary',
     },
     VList: {
       elevation: 0,
       rounded: 'lg',
+      bg: 'surface',
+    },
+    VListItem: {
+      rounded: 'lg',
+      class: 'ios-list-item',
+    },
+    VTabs: {
+      color: 'primary',
+      alignTabs: 'center',
+      sliderColor: 'primary',
+    },
+    VDivider: {
+      class: 'ios-divider',
+    },
+    VSnackbar: {
+      location: 'top',
+    },
+    VNavigationDrawer: {
+      bgColor: 'background',
+    },
+    VAppBar: {
+      flat: true,
+      color: 'background',
+      height: 56,
     },
   },
 })
