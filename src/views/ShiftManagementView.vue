@@ -97,15 +97,16 @@
           @remove-porter="confirmRemovePorter"
         />
         
-        <!-- Department Assignments -->
-        <DepartmentGrid
-          :departments="buildingsStore.departments"
-          :designations="designationsStore.designations"
-          :porters="shiftDetails.porters || []"
-          :is-loading="isLoadingPorters || designationsStore.isLoading"
-          :is-shift-active="shiftDetails.is_active"
-          @unassign-porter="confirmRemoveAssignment"
-        />
+      <!-- Department Assignments -->
+      <DepartmentGrid
+        :departments="buildingsStore.departments"
+        :designations="designationsStore.designations"
+        :porters="shiftDetails.porters || []"
+        :is-loading="isLoadingPorters || designationsStore.isLoading"
+        :is-shift-active="shiftDetails.is_active"
+        @unassign-porter="confirmRemoveAssignment"
+        @edit-porter-times="editPorterTimes"
+      />
       </div>
     </template>
     
@@ -534,6 +535,13 @@ const removePorterAssignment = async () => {
   } finally {
     isLoadingPorters.value = false
   }
+}
+
+// Method to edit porter times when clicked from department card
+const editPorterTimes = (porter) => {
+  selectedPorter.value = porter
+  isEditingAssignment.value = true
+  assignmentDialogVisible.value = true
 }
 </script>
 

@@ -26,6 +26,7 @@
         :porters="porters"
         :is-shift-active="isShiftActive"
         @unassign-porter="(porter) => $emit('unassign-porter', porter)"
+        @edit-porter-times="(porter) => $emit('edit-porter-times', porter)"
       />
     </div>
   </div>
@@ -59,7 +60,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['unassign-porter'])
+const emit = defineEmits(['unassign-porter', 'edit-porter-times'])
 
 // Computed properties
 const designationDepartments = computed(() => {

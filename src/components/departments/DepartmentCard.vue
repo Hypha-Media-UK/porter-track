@@ -32,6 +32,8 @@
           v-for="porter in assignedPorters" 
           :key="porter.id"
           class="porter-item"
+          @click="$emit('edit-porter-times', porter)"
+          :class="{'clickable': isShiftActive}"
         >
           <div class="d-flex align-center justify-space-between">
             <div class="d-flex align-center">
@@ -91,7 +93,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['unassign-porter'])
+const emit = defineEmits(['unassign-porter', 'edit-porter-times'])
 
 // Computed properties
 const assignedPorters = computed(() => {
@@ -165,6 +167,17 @@ const getPorterDesignation = (porter) => {
 
 .porter-item:last-child {
   border-bottom: none;
+}
+
+.clickable {
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border-radius: 4px;
+  padding: 8px 4px;
+}
+
+.clickable:hover {
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 .porter-info {
