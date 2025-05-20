@@ -13,11 +13,13 @@
         centered
         show-arrows
         class="mb-6 ios-tabs"
+        slider-color="primary"
+        bg-color="transparent"
       >
-        <v-tab value="buildings" class="ios-tab">Buildings</v-tab>
-        <v-tab value="tasks" class="ios-tab">Tasks</v-tab>
-        <v-tab value="staff" class="ios-tab">Staff</v-tab>
-        <v-tab value="app" class="ios-tab">App Settings</v-tab>
+        <v-tab value="buildings" class="ios-tab" active-class="ios-tab--active">Buildings</v-tab>
+        <v-tab value="tasks" class="ios-tab" active-class="ios-tab--active">Tasks</v-tab>
+        <v-tab value="staff" class="ios-tab" active-class="ios-tab--active">Staff</v-tab>
+        <v-tab value="app" class="ios-tab" active-class="ios-tab--active">App Settings</v-tab>
       </v-tabs>
     </div>
 
@@ -99,16 +101,57 @@ onMounted(() => {
 }
 
 .ios-tabs {
-  border-radius: 10px;
-  background-color: rgba(0, 0, 0, 0.03);
   padding: 4px;
+  background-color: transparent;
+  position: relative;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .ios-tab {
-  border-radius: 8px;
   min-width: 120px;
-  font-weight: 500;
+  font-weight: 400;
   transition: all 0.2s ease;
+  position: relative;
+  opacity: 0.7;
+  border-radius: 0 !important;
+  background-color: transparent !important;
+}
+
+.ios-tab--active {
+  font-weight: 500;
+  opacity: 1;
+  color: #007AFF !important;
+  background-color: transparent !important;
+}
+
+/* Override Vuetify's default tab styling */
+:deep(.v-tab--selected) {
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+:deep(.v-tab) {
+  box-shadow: none !important;
+  border: none !important;
+  outline: none !important;
+}
+
+:deep(.v-tab:before),
+:deep(.v-tab:after) {
+  display: none !important;
+}
+
+:deep(.v-tabs__container),
+:deep(.v-tabs-bar) {
+  background-color: transparent !important;
+  border: none !important;
+}
+
+/* Customizing Vuetify's tab slider */
+:deep(.v-tabs-slider) {
+  height: 2px !important;
+  background-color: #007AFF !important;
 }
 
 .ios-settings-view__content {
@@ -117,7 +160,15 @@ onMounted(() => {
 
 @media (prefers-color-scheme: dark) {
   .ios-tabs {
-    background-color: rgba(255, 255, 255, 0.05);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .ios-tab--active {
+    color: #0A84FF !important;
+  }
+  
+  :deep(.v-tabs-slider) {
+    background-color: #0A84FF !important;
   }
 }
 

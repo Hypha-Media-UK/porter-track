@@ -208,12 +208,18 @@ const handleBlur = (event) => {
   display: flex;
   align-items: center;
   min-height: 44px;
+  position: relative;
+  width: 100%;
+  justify-content: space-between;
 }
 
 .ios-list-item__text {
   flex: 1;
   cursor: text;
   text-align: left;
+  max-width: calc(100% - 120px); /* Reserve space for action buttons */
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .ios-list-item__primary {
@@ -233,9 +239,12 @@ const handleBlur = (event) => {
 
 .ios-list-item__actions {
   display: flex;
-  gap: 4px;
-  margin-left: auto; /* Push actions to the right */
+  gap: 8px;
+  margin-left: 16px; /* Fixed spacing from text */
   justify-content: flex-end; /* Ensure right alignment */
+  min-width: 100px; /* Minimum width for action buttons */
+  position: relative; /* Allow for absolute positioning if needed */
+  flex-shrink: 0; /* Prevent shrinking */
 }
 
 .ios-list-item__edit {
