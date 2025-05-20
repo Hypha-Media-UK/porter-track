@@ -16,12 +16,8 @@
         <h3 class="text-h5 mb-2">No staff yet</h3>
         <p class="mb-4">Add your first staff member to get started</p>
         <div class="d-flex justify-center gap-2">
-          <IOSButton color="primary" prependIcon="mdi-plus" @click="addStaff('supervisor')">
-            Add Supervisor
-          </IOSButton>
-          <IOSButton color="secondary" prependIcon="mdi-plus" @click="addStaff('porter')">
-            Add Porter
-          </IOSButton>
+          <AddButton color="primary" @click="addStaff('supervisor')" />
+          <AddButton color="secondary" @click="addStaff('porter')" />
         </div>
       </div>
     </IOSCard>
@@ -40,13 +36,11 @@
                 class="ml-3"
               ></v-badge>
             </div>
-            <IOSButton 
+            <AddButton 
               color="primary" 
-              prependIcon="mdi-plus"
+              size="x-small"
               @click="addStaff('supervisor')"
-            >
-              Add
-            </IOSButton>
+            />
           </div>
         </div>
         
@@ -84,13 +78,11 @@
                 class="ml-3"
               ></v-badge>
             </div>
-            <IOSButton 
+            <AddButton 
               color="secondary" 
-              prependIcon="mdi-plus"
+              size="x-small"
               @click="addStaff('porter')"
-            >
-              Add
-            </IOSButton>
+            />
           </div>
         </div>
         
@@ -186,6 +178,7 @@ import { useStaffStore } from '../../stores/staff'
 import IOSCard from '../common/IOSCard.vue'
 import IOSListItem from '../common/IOSListItem.vue'
 import IOSButton from '../common/IOSButton.vue'
+import AddButton from '../common/AddButton.vue'
 
 // Store
 const staffStore = useStaffStore()

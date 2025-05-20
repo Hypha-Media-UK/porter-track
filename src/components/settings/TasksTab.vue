@@ -2,13 +2,10 @@
   <section class="tasks-tab">
     <!-- Actions -->
     <div class="d-flex justify-end mb-4">
-      <IOSButton 
+      <AddButton 
         color="primary" 
-        prependIcon="mdi-plus"
         @click="addTask"
-      >
-        Add Task
-      </IOSButton>
+      />
     </div>
     
     <!-- Loading Indicator -->
@@ -23,9 +20,7 @@
         <v-icon icon="mdi-clipboard-text-outline" size="x-large" color="secondary" class="mb-4"></v-icon>
         <h3 class="text-h5 mb-2">No tasks yet</h3>
         <p class="mb-4">Add your first task to get started</p>
-        <IOSButton color="primary" prependIcon="mdi-plus" @click="addTask">
-          Add Task
-        </IOSButton>
+        <AddButton color="primary" @click="addTask" />
       </div>
     </IOSCard>
     
@@ -78,15 +73,12 @@
           </div>
           
           <!-- Add Task Item Button -->
-          <div class="px-4 pb-3 pt-2 text-center">
-            <IOSButton
-              variant="text"
-              size="small"
-              prependIcon="mdi-plus"
+          <div class="px-4 pb-3 pt-2 d-flex justify-center">
+            <AddButton
+              color="secondary"
+              size="x-small"
               @click="addTaskItem(task)"
-            >
-              Add Task Item
-            </IOSButton>
+            />
           </div>
         </div>
       </IOSCard>
@@ -260,6 +252,7 @@ import { useBuildingsStore } from '../../stores/buildings'
 import IOSCard from '../common/IOSCard.vue'
 import IOSListItem from '../common/IOSListItem.vue'
 import IOSButton from '../common/IOSButton.vue'
+import AddButton from '../common/AddButton.vue'
 import TaskItemDepartmentAssociation from '../task-items/TaskItemDepartmentAssociation.vue'
 
 // Stores

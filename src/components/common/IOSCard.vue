@@ -34,13 +34,14 @@ defineProps({
 
 /* iOS style headers */
 .ios-card :deep(.ios-card-header) {
-  padding: 16px;
+  padding: 12px 16px;
   font-size: 20px;
   font-weight: 600;
   color: #000000;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr auto;
   align-items: center;
+  gap: 12px;
 }
 
 /* iOS style content sections */

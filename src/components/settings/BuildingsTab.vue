@@ -2,13 +2,10 @@
   <section class="buildings-tab">
     <!-- Actions -->
     <div class="d-flex justify-end mb-4">
-      <IOSButton 
+      <AddButton 
         color="primary" 
-        prependIcon="mdi-plus"
         @click="addBuilding"
-      >
-        Add Building
-      </IOSButton>
+      />
     </div>
     
     <!-- Loading Indicator -->
@@ -23,9 +20,7 @@
         <v-icon icon="mdi-office-building-outline" size="x-large" color="secondary" class="mb-4"></v-icon>
         <h3 class="text-h5 mb-2">No buildings yet</h3>
         <p class="mb-4">Add your first building to get started</p>
-        <IOSButton color="primary" prependIcon="mdi-plus" @click="addBuilding">
-          Add Building
-        </IOSButton>
+        <AddButton color="primary" @click="addBuilding" />
       </div>
     </IOSCard>
     
@@ -70,15 +65,12 @@
           </div>
           
           <!-- Add Department Button -->
-          <div class="px-4 pb-3 pt-2 text-center">
-            <IOSButton
-              variant="text"
-              size="small"
-              prependIcon="mdi-plus"
+          <div class="px-4 pb-3 pt-2 d-flex justify-center">
+            <AddButton
+              color="primary"
+              size="x-small"
               @click="addDepartment(building)"
-            >
-              Add Department
-            </IOSButton>
+            />
           </div>
         </div>
       </IOSCard>
@@ -184,6 +176,7 @@ import { useBuildingsStore } from '../../stores/buildings'
 import IOSCard from '../common/IOSCard.vue'
 import IOSListItem from '../common/IOSListItem.vue'
 import IOSButton from '../common/IOSButton.vue'
+import AddButton from '../common/AddButton.vue'
 
 // Store
 const buildingsStore = useBuildingsStore()
