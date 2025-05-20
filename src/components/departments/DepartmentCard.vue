@@ -53,13 +53,14 @@
               </div>
             </div>
             
-            <div class="porter-actions" v-if="isShiftActive">
+            <div class="porter-actions">
               <v-btn
                 variant="text"
                 color="warning"
                 size="x-small"
                 icon="mdi-account-convert"
                 @click="$emit('unassign-porter', porter)"
+                :disabled="!isShiftActive"
               >
                 <v-tooltip activator="parent" location="top">
                   Return to Porters Pool

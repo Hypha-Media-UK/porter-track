@@ -316,12 +316,17 @@ onMounted(async () => {
   }
 })
 
-// Watch for route changes
-watch(() => route.params.id, async (newId) => {
-  if (newId) {
-    await shiftsStore.fetchShiftDetails(newId)
-  }
-})
+  // Watch for route changes
+  watch(() => route.params.id, async (newId) => {
+    if (newId) {
+      // Reset the state first to avoid data from previous shifts
+      shiftDetails.value = null
+      await shiftsStore.fetchShiftDetails(newId)
+      
+      // Log shift active state for debugging
+      console.log('Shift active state:', shiftsStore.shiftDetails?.is_active)
+    }
+  })
 
 // Format date and time
 const formatDateTime = (dateString) => {

@@ -4,7 +4,6 @@
       <h2 class="text-h6 font-weight-medium">Porters on Shift</h2>
       <div class="d-flex align-center">
         <v-select
-          v-if="isShiftActive"
           v-model="selectedPorterId"
           :items="availablePorters"
           item-title="name"
@@ -14,13 +13,12 @@
           density="compact"
           hide-details
           class="porter-select mr-2"
-          :disabled="isLoading || availablePorters.length === 0"
+          :disabled="!isShiftActive || isLoading || availablePorters.length === 0"
         ></v-select>
         <IOSButton
-          v-if="isShiftActive"
           color="primary"
           size="small"
-          :disabled="!selectedPorterId || isLoading"
+          :disabled="!isShiftActive || !selectedPorterId || isLoading"
           @click="addPorter"
           :loading="isLoading"
         >

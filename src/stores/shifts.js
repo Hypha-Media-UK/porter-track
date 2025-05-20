@@ -137,6 +137,7 @@ export const useShiftsStore = defineStore('shifts', () => {
           start_time,
           end_time,
           is_active,
+          shift_id,
           departments!department_id(id, name, building_id),
           department_designations!designation_id(id, name)
         `)
@@ -204,6 +205,30 @@ export const useShiftsStore = defineStore('shifts', () => {
 
   const createShift = async (shiftData) => {
     try {
+      // First make sure any existing active shifts are ended
+      const { data: activeShifts } = await supabase
+        .from('shifts')
+        .select('id')
+        .eq('is_active', true)
+      
+      if (activeShifts && activeShifts.length > 0) {
+        // End all active shifts
+        for (const shift of activeShifts) {
+          await supabase
+            .from('shifts')
+            .update({
+              end_time: new Date(),
+              is_active: false,
+              updated_at: new Date()
+            })
+            .eq('id', shift.id)
+        }
+      }
+      
+      // Reset the shift details to avoid carrying over previous shift data
+      shiftDetails.value = null
+      
+      // Create the new shift
       const { data, error: err } = await supabase
         .from('shifts')
         .insert([{

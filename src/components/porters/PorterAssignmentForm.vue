@@ -111,7 +111,7 @@ const props = defineProps({
   },
   shiftId: {
     type: String,
-    required: true
+    default: ''
   },
   porter: {
     type: Object,
