@@ -7,19 +7,28 @@ const routes = [
     component: () => import('../views/HomeView.vue')
   },
   {
+    path: '/settings',
+    name: 'Settings',
+    component: () => import('../views/SettingsView.vue'),
+    props: (route) => ({ activeTab: route.query.tab || 'app' })
+  },
+  // Redirect legacy routes to the new tabbed settings
+  {
     path: '/buildings',
-    name: 'Buildings',
-    component: () => import('../views/BuildingsView.vue')
+    redirect: to => {
+      return { path: '/settings', query: { tab: 'buildings' } }
+    }
   },
   {
     path: '/tasks',
-    name: 'Tasks',
-    component: () => import('../views/TasksView.vue')
+    redirect: to => {
+      return { path: '/settings', query: { tab: 'tasks' } }
+    }
   },
+  // Catch-all redirect to home
   {
-    path: '/settings',
-    name: 'Settings',
-    component: () => import('../views/SettingsView.vue')
+    path: '/:pathMatch(.*)*',
+    redirect: '/'
   }
 ]
 

@@ -1,79 +1,113 @@
 <template>
-  <v-container>
-    <v-row>
-      <v-col cols="12">
-        <v-card>
-          <v-card-title class="text-h5">
-            Application Settings
-          </v-card-title>
-          <v-card-text>
-            <p class="text-subtitle-1 mb-4">Configure Porter Track settings</p>
-            
-            <v-list>
-              <v-list-subheader>Data Management</v-list-subheader>
-              
-              <v-list-item>
-                <template v-slot:prepend>
-                  <v-icon color="primary">mdi-office-building</v-icon>
-                </template>
-                <v-list-item-title>
-                  <router-link to="/buildings" class="text-decoration-none">
-                    Manage Buildings and Departments
-                  </router-link>
-                </v-list-item-title>
-                <v-list-item-subtitle>
-                  Add, edit, or remove buildings and departments
-                </v-list-item-subtitle>
-              </v-list-item>
-              
-              <v-list-item>
-                <template v-slot:prepend>
-                  <v-icon color="primary">mdi-clipboard-list</v-icon>
-                </template>
-                <v-list-item-title>
-                  <router-link to="/tasks" class="text-decoration-none">
-                    Manage Tasks and Task Items
-                  </router-link>
-                </v-list-item-title>
-                <v-list-item-subtitle>
-                  Add, edit, or remove tasks and their sub-items
-                </v-list-item-subtitle>
-              </v-list-item>
-              
-              <v-divider class="my-3"></v-divider>
-              <v-list-subheader>About</v-list-subheader>
-              
-              <v-list-item>
-                <template v-slot:prepend>
-                  <v-icon>mdi-information</v-icon>
-                </template>
-                <v-list-item-title>
-                  Porter Track
-                </v-list-item-title>
-                <v-list-item-subtitle>
-                  Version 1.0.0
-                </v-list-item-subtitle>
-              </v-list-item>
-              
-              <v-list-item>
-                <template v-slot:prepend>
-                  <v-icon>mdi-help-circle</v-icon>
-                </template>
-                <v-list-item-title>
-                  Support
-                </v-list-item-title>
-                <v-list-item-subtitle>
-                  Contact IT helpdesk for assistance
-                </v-list-item-subtitle>
-              </v-list-item>
-            </v-list>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-  </v-container>
+  <div class="settings-container">
+    <!-- Page Header -->
+    <header class="mb-4">
+      <h1 class="text-h4 font-weight-medium mb-1">Settings</h1>
+      <p class="text-subtitle-1 text-medium-emphasis">Configure Porter Track</p>
+    </header>
+
+    <!-- Tab Navigation -->
+    <v-tabs
+      v-model="currentTab"
+      color="primary"
+      align-tabs="center"
+      class="mb-6"
+      grow
+    >
+      <v-tab value="buildings" class="text-subtitle-1" prepend-icon="mdi-office-building-outline">
+        Buildings
+      </v-tab>
+      <v-tab value="tasks" class="text-subtitle-1" prepend-icon="mdi-clipboard-text-outline">
+        Tasks
+      </v-tab>
+      <v-tab value="app" class="text-subtitle-1" prepend-icon="mdi-cog-outline">
+        App Settings
+      </v-tab>
+    </v-tabs>
+
+    <!-- Tab Contents -->
+    <v-window v-model="currentTab" class="settings-content">
+      <!-- Buildings Tab Content -->
+      <v-window-item value="buildings">
+        <div class="tab-content">
+          <BuildingsTab />
+        </div>
+      </v-window-item>
+      
+      <!-- Tasks Tab Content -->
+      <v-window-item value="tasks">
+        <div class="tab-content">
+          <TasksTab />
+        </div>
+      </v-window-item>
+      
+      <!-- App Settings Tab Content -->
+      <v-window-item value="app">
+        <div class="tab-content">
+          <AppSettingsTab />
+        </div>
+      </v-window-item>
+    </v-window>
+  </div>
 </template>
 
 <script setup>
-// Settings view component
+import { ref, watch, onMounted } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
+import BuildingsTab from '../components/settings/BuildingsTab.vue'
+import TasksTab from '../components/settings/TasksTab.vue'
+import AppSettingsTab from '../components/settings/AppSettingsTab.vue'
+
+const props = defineProps({
+  activeTab: {
+    type: String,
+    default: 'app'
+  }
+})
+
+const route = useRoute()
+const router = useRouter()
+const currentTab = ref(props.activeTab)
+
+// Watch for direct URL navigation with query params
+watch(() => route.query.tab, (newTab) => {
+  if (newTab && ['buildings', 'tasks', 'app'].includes(newTab)) {
+    currentTab.value = newTab
+  }
+})
+
+// Update URL when tab changes
+watch(currentTab, (newTab) => {
+  if (route.query.tab !== newTab) {
+    router.replace({ query: { ...route.query, tab: newTab } })
+  }
+})
+
+// Set initial tab on mount
+onMounted(() => {
+  // If URL has a tab query param, use it
+  const tabParam = route.query.tab
+  if (tabParam && ['buildings', 'tasks', 'app'].includes(tabParam)) {
+    currentTab.value = tabParam
+  }
+})
 </script>
+
+<style scoped>
+.settings-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.tab-content {
+  min-height: 400px;
+}
+
+/* Add some tablet/desktop-specific styling */
+@media (min-width: 768px) {
+  .settings-container {
+    padding: 24px;
+  }
+}
+</style>
