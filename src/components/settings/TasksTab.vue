@@ -195,13 +195,13 @@
     <!-- Task Department Assignment Dialog -->
     <v-dialog v-model="departmentAssignDialogVisible" max-width="500" persistent>
       <v-card class="ios-dialog">
-        <v-card-title class="text-h5">Assign to Departments</v-card-title>
+        <v-card-title class="text-h5">Assign to Department</v-card-title>
         <v-card-text>
           <div v-if="!buildingsStore.buildings.length" class="text-center py-4">
             <p>No departments available. Please add buildings and departments first.</p>
           </div>
           <div v-else>
-            <p class="mb-4">Select departments to assign to this task:</p>
+            <p class="mb-4">Select a department to assign to this task:</p>
             
             <v-expansion-panels variant="accordion">
               <v-expansion-panel
@@ -211,16 +211,17 @@
               >
                 <v-expansion-panel-title>{{ building.name }}</v-expansion-panel-title>
                 <v-expansion-panel-text>
-                  <v-checkbox
-                    v-for="dept in building.departments"
-                    :key="dept.id"
-                    v-model="selectedDepartments"
-                    :value="dept.id"
-                    :label="dept.name"
-                    color="primary"
-                    hide-details
-                    class="mb-2"
-                  ></v-checkbox>
+                  <v-radio-group v-model="selectedDepartment">
+                    <v-radio
+                      v-for="dept in building.departments"
+                      :key="dept.id"
+                      :value="dept.id"
+                      :label="dept.name"
+                      color="primary"
+                      hide-details
+                      class="mb-2"
+                    ></v-radio>
+                  </v-radio-group>
                 </v-expansion-panel-text>
               </v-expansion-panel>
             </v-expansion-panels>
@@ -285,7 +286,8 @@ const newTask = ref({ name: '' })
 const newTaskItem = ref({ name: '', task_id: null })
 const currentTask = ref(null)
 const currentTaskItem = ref(null)
-const selectedDepartments = ref([])
+const selectedDepartment = ref(null)
+const selectedDepartments = ref([]) // Keep this for backward compatibility
 
 // Fetch data
 onMounted(async () => {
@@ -365,15 +367,18 @@ const confirmDeleteTaskItem = (taskItem) => {
 // Department assignment operations for tasks
 const openDepartmentAssignmentDialog = (task) => {
   currentTask.value = task
-  selectedDepartments.value = task.departments 
-    ? task.departments.map(dept => dept.id) 
-    : []
+  // Set the selected department to the first one in the list (for single selection)
+  selectedDepartment.value = task.departments && task.departments.length > 0 
+    ? task.departments[0].id 
+    : null
   departmentAssignDialogVisible.value = true
 }
 
 const saveDepartmentAssignments = async () => {
   try {
-    await tasksStore.updateTaskDepartments(currentTask.value.id, selectedDepartments.value)
+    // Create an array with the single department ID or empty array
+    const departmentIds = selectedDepartment.value ? [selectedDepartment.value] : []
+    await tasksStore.updateTaskDepartments(currentTask.value.id, departmentIds)
     departmentAssignDialogVisible.value = false
   } catch (error) {
     console.error('Error updating department assignments:', error)
