@@ -473,6 +473,10 @@ const assignPorterToDepartment = async (assignment) => {
     
     // Refresh shift details to show the new assignment
     await shiftsStore.fetchShiftDetails(shiftId.value)
+    
+    // Close the dialogs after successful assignment
+    departmentSelectDialogVisible.value = false
+    assignmentDialogVisible.value = false
   } catch (error) {
     console.error('Error assigning porter to department:', error)
   } finally {
