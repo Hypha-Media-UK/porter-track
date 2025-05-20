@@ -22,6 +22,10 @@
           <v-icon icon="mdi-clipboard-text-outline" class="mr-2"></v-icon>
           Tasks
         </v-tab>
+        <v-tab value="staff" class="ios-tab">
+          <v-icon icon="mdi-account-group" class="mr-2"></v-icon>
+          Staff
+        </v-tab>
         <v-tab value="app" class="ios-tab">
           <v-icon icon="mdi-cog-outline" class="mr-2"></v-icon>
           App Settings
@@ -39,6 +43,10 @@
         <TasksTab />
       </v-window-item>
       
+      <v-window-item value="staff">
+        <StaffTab />
+      </v-window-item>
+      
       <v-window-item value="app">
         <AppSettingsTab />
       </v-window-item>
@@ -51,6 +59,7 @@ import { ref, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import BuildingsTab from '../components/settings/BuildingsTab.vue'
 import TasksTab from '../components/settings/TasksTab.vue'
+import StaffTab from '../components/settings/StaffTab.vue'
 import AppSettingsTab from '../components/settings/AppSettingsTab.vue'
 
 const props = defineProps({
@@ -66,7 +75,7 @@ const currentTab = ref(props.activeTab)
 
 // Watch for direct URL navigation with query params
 watch(() => route.query.tab, (newTab) => {
-  if (newTab && ['buildings', 'tasks', 'app'].includes(newTab)) {
+  if (newTab && ['buildings', 'tasks', 'staff', 'app'].includes(newTab)) {
     currentTab.value = newTab
   }
 })
@@ -82,7 +91,7 @@ watch(currentTab, (newTab) => {
 onMounted(() => {
   // If URL has a tab query param, use it
   const tabParam = route.query.tab
-  if (tabParam && ['buildings', 'tasks', 'app'].includes(tabParam)) {
+  if (tabParam && ['buildings', 'tasks', 'staff', 'app'].includes(tabParam)) {
     currentTab.value = tabParam
   }
 })
