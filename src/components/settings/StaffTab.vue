@@ -37,11 +37,13 @@
       <IOSCard class="staff-card">
         <div class="ios-card-header">
           <div class="d-flex justify-space-between align-center pa-4">
-            <div>
+            <div class="d-flex align-center">
               <h2 class="text-h5 font-weight-medium">Supervisors</h2>
-              <p class="text-body-2 text-medium-emphasis">
-                {{ supervisors.length }} {{ supervisors.length === 1 ? 'supervisor' : 'supervisors' }}
-              </p>
+              <v-badge
+                :content="supervisors.length"
+                color="primary"
+                class="ml-3"
+              ></v-badge>
             </div>
             <IOSButton 
               color="primary" 
@@ -60,8 +62,6 @@
               v-for="supervisor in supervisors"
               :key="supervisor.id"
               :model-value="supervisor.name"
-              icon="mdi-account-tie"
-              icon-color="primary"
               :editable="true"
               :deletable="true"
               placeholder="Supervisor name"
@@ -81,11 +81,13 @@
       <IOSCard class="staff-card">
         <div class="ios-card-header">
           <div class="d-flex justify-space-between align-center pa-4">
-            <div>
+            <div class="d-flex align-center">
               <h2 class="text-h5 font-weight-medium">Porters</h2>
-              <p class="text-body-2 text-medium-emphasis">
-                {{ porters.length }} {{ porters.length === 1 ? 'porter' : 'porters' }}
-              </p>
+              <v-badge
+                :content="porters.length"
+                color="secondary"
+                class="ml-3"
+              ></v-badge>
             </div>
             <IOSButton 
               color="secondary" 
@@ -104,8 +106,6 @@
               v-for="porter in porters"
               :key="porter.id"
               :model-value="porter.name"
-              icon="mdi-account"
-              icon-color="secondary"
               :editable="true"
               :deletable="true"
               placeholder="Porter name"

@@ -234,6 +234,8 @@ const handleBlur = (event) => {
 .ios-list-item__actions {
   display: flex;
   gap: 4px;
+  margin-left: auto; /* Push actions to the right */
+  justify-content: flex-end; /* Ensure right alignment */
 }
 
 .ios-list-item__edit {
