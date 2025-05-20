@@ -5,7 +5,7 @@
     <div class="time-input__field">
       <v-text-field
         :id="id"
-        type="datetime-local"
+        type="time"
         :model-value="formattedValue"
         :placeholder="placeholder"
         :hint="hint"
@@ -98,7 +98,7 @@ const emit = defineEmits(['update:modelValue', 'blur'])
 // Generate a unique ID for the input field
 const id = ref(`time-input-${Math.random().toString(36).substr(2, 9)}`)
 
-// Format the value for the input
+// Format the value for the input - now just returns HH:MM
 const formattedValue = computed(() => {
   if (!props.modelValue) return ''
   
@@ -108,27 +108,36 @@ const formattedValue = computed(() => {
   
   if (isNaN(date.getTime())) return ''
   
-  // Format as yyyy-MM-ddThh:mm (format required by datetime-local input)
-  const year = date.getFullYear()
-  const month = String(date.getMonth() + 1).padStart(2, '0')
-  const day = String(date.getDate()).padStart(2, '0')
+  // Format as HH:MM (format required by time input)
   const hours = String(date.getHours()).padStart(2, '0')
   const minutes = String(date.getMinutes()).padStart(2, '0')
   
-  return `${year}-${month}-${day}T${hours}:${minutes}`
+  return `${hours}:${minutes}`
 })
 
 // Update the model value when the input changes
-const updateValue = (newValue) => {
-  if (!newValue) {
+const updateValue = (newTimeValue) => {
+  if (!newTimeValue) {
     emit('update:modelValue', null)
     return
   }
   
-  const date = new Date(newValue)
-  if (!isNaN(date.getTime())) {
-    emit('update:modelValue', date)
-  }
+  // Parse the time string (HH:MM)
+  const [hours, minutes] = newTimeValue.split(':').map(Number)
+  
+  // Get the current date from the model value or use today
+  const currentDate = props.modelValue instanceof Date 
+    ? new Date(props.modelValue) 
+    : props.modelValue 
+      ? new Date(props.modelValue) 
+      : new Date()
+  
+  // Create new date with same day but updated time
+  const newDate = new Date(currentDate)
+  newDate.setHours(hours)
+  newDate.setMinutes(minutes)
+  
+  emit('update:modelValue', newDate)
 }
 
 // Set the time to the current time

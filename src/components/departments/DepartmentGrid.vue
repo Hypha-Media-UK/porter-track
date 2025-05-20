@@ -75,8 +75,11 @@ const designationDepartments = computed(() => {
       assignedPorters: props.porters.filter(porter => {
         if (!porter.departmentAssignments) return false
         
+        // Check for assignments where the designation_id matches
+        // and is_active is true (regardless of department_id)
         return porter.departmentAssignments.some(assignment => 
-          assignment.is_active && assignment.designation_id === designation.id
+          assignment.is_active && 
+          assignment.designation_id === designation.id
         )
       })
     }

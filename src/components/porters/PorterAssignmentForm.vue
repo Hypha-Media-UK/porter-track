@@ -69,7 +69,7 @@
             <TimeInput
               v-model="form.endTime"
               label="End Time (Optional)"
-              show-now-button="false"
+              :show-now-button="false"
             />
           </div>
         </v-form>

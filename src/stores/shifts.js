@@ -332,18 +332,10 @@ export const useShiftsStore = defineStore('shifts', () => {
         shift_id: assignment.shiftId,
         porter_id: assignment.porterId,
         designation_id: assignment.designationId || null,
+        department_id: null, // Always set department_id to null for Department Cover assignments
         start_time: assignment.startTime || new Date(),
         end_time: assignment.endTime,
         is_active: true
-      }
-      
-      // Handle department_id (we're not sending it anymore since we removed the field)
-      // Only include department_id if we're editing and it exists in the original data
-      if (assignment.departmentId) {
-        assignmentData.department_id = assignment.departmentId
-      } else {
-        // Set department_id to null if not provided (required by the database schema)
-        assignmentData.department_id = null
       }
       
       // Then create the new assignment

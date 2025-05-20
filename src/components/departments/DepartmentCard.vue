@@ -127,7 +127,7 @@ const getPorterDesignation = (porter) => {
   let activeAssignment;
   
   if (props.department.isDesignation) {
-    // For designation-based departments, find by designation_id
+    // For designation-based departments (Department Cover), find by designation_id
     activeAssignment = porter.departmentAssignments.find(assignment => 
       assignment.is_active && assignment.designation_id === props.department.id
     )
