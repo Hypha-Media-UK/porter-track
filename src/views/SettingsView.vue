@@ -5,33 +5,7 @@
       <h1 class="text-h4 font-weight-medium">Settings</h1>
     </header>
 
-    <!-- Tab Navigation -->
-    <div class="ios-settings-view__tabs">
-      <v-tabs
-        v-model="currentTab"
-        color="primary"
-        centered
-        show-arrows
-        class="mb-6 ios-tabs"
-      >
-        <v-tab value="buildings" class="ios-tab">
-          <v-icon icon="mdi-office-building-outline" class="mr-2"></v-icon>
-          Buildings
-        </v-tab>
-        <v-tab value="tasks" class="ios-tab">
-          <v-icon icon="mdi-clipboard-text-outline" class="mr-2"></v-icon>
-          Tasks
-        </v-tab>
-        <v-tab value="staff" class="ios-tab">
-          <v-icon icon="mdi-account-group" class="mr-2"></v-icon>
-          Staff
-        </v-tab>
-        <v-tab value="app" class="ios-tab">
-          <v-icon icon="mdi-cog-outline" class="mr-2"></v-icon>
-          App Settings
-        </v-tab>
-      </v-tabs>
-    </div>
+    <!-- No tab navigation -->
 
     <!-- Tab Contents -->
     <v-window v-model="currentTab" class="ios-settings-view__content">

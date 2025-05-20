@@ -1,11 +1,7 @@
 <template>
   <section class="buildings-tab">
-    <!-- Header and Actions -->
-    <div class="buildings-tab__header mb-4">
-      <div>
-        <h1 class="text-h4 font-weight-medium mb-1">Buildings</h1>
-        <p class="text-body-1 text-medium-emphasis">Manage buildings and departments</p>
-      </div>
+    <!-- Actions -->
+    <div class="d-flex justify-end mb-4">
       <IOSButton 
         color="primary" 
         prependIcon="mdi-plus"
@@ -44,8 +40,6 @@
         <div class="ios-card-header">
           <IOSListItem
             :model-value="building.name"
-            icon="mdi-office-building-outline"
-            icon-color="primary"
             :editable="true"
             :deletable="true"
             placeholder="Building name"
@@ -62,8 +56,6 @@
               v-for="dept in building.departments"
               :key="dept.id"
               :model-value="dept.name"
-              icon="mdi-door-outline"
-              icon-color="secondary"
               :editable="true"
               :deletable="true"
               placeholder="Department name"

@@ -1,12 +1,7 @@
 <template>
   <section class="staff-tab">
-    <!-- Header and Actions -->
-    <div class="staff-tab__header mb-4">
-      <div>
-        <h1 class="text-h4 font-weight-medium mb-1">Staff</h1>
-        <p class="text-body-1 text-medium-emphasis">Manage supervisors and porters</p>
-      </div>
-    </div>
+    <!-- Actions -->
+    <div class="d-flex justify-end mb-4"></div>
     
     <!-- Loading Indicator -->
     <div v-if="staffStore.isLoading" class="text-center py-6">

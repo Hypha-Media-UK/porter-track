@@ -1,11 +1,7 @@
 <template>
   <section class="tasks-tab">
-    <!-- Header and Actions -->
-    <div class="tasks-tab__header mb-4">
-      <div>
-        <h1 class="text-h4 font-weight-medium mb-1">Tasks</h1>
-        <p class="text-body-1 text-medium-emphasis">Manage tasks and task items</p>
-      </div>
+    <!-- Actions -->
+    <div class="d-flex justify-end mb-4">
       <IOSButton 
         color="primary" 
         prependIcon="mdi-plus"
@@ -44,8 +40,6 @@
         <div class="ios-card-header">
           <IOSListItem
             :model-value="task.name"
-            icon="mdi-clipboard-text-outline"
-            icon-color="primary"
             :editable="true"
             :deletable="true"
             :department-assignable="true"
@@ -66,8 +60,6 @@
               v-for="item in task.taskItems"
               :key="item.id"
               :model-value="item.name"
-              icon="mdi-checkbox-marked-circle-outline"
-              icon-color="secondary"
               :editable="true"
               :deletable="true"
               :department-assignable="true"
