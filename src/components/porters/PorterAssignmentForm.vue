@@ -7,7 +7,7 @@
   >
     <v-card class="ios-dialog">
       <v-card-title class="text-h5">
-        {{ isEdit ? 'Update Porter Assignment' : 'Assign Porter Designation' }}
+        {{ isEdit ? 'Update Porter Assignment Times' : 'Add Porter to Department' }}
       </v-card-title>
       
       <v-card-text>
@@ -26,36 +26,6 @@
               <div class="text-h6">{{ porter?.name }}</div>
             </div>
           </div>
-          
-          <!-- Department field removed as requested -->
-          
-          <!-- Designation Selection -->
-          <v-autocomplete
-            v-model="form.designationId"
-            :items="designations"
-            item-title="name"
-            item-value="id"
-            label="Designation (Optional)"
-            variant="outlined"
-            density="comfortable"
-            clearable
-            class="mb-4"
-            :disabled="!designations.length"
-          >
-            <template #prepend>
-              <v-tooltip location="bottom" v-if="!designations.length">
-                <template #activator="{ props }">
-                  <v-icon
-                    icon="mdi-information-outline"
-                    color="info"
-                    size="small"
-                    v-bind="props"
-                  ></v-icon>
-                </template>
-                <span>No designations available. You can add them in Settings.</span>
-              </v-tooltip>
-            </template>
-          </v-autocomplete>
           
           <!-- Time Fields -->
           <div class="time-fields">
@@ -89,7 +59,7 @@
           :disabled="isLoading"
           @click="submitForm"
         >
-          Assign
+          {{ isEdit ? 'Update' : 'Assign' }}
         </IOSButton>
       </v-card-actions>
     </v-card>
@@ -99,7 +69,6 @@
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import { useBuildingsStore } from '../../stores/buildings'
-import { useDepartmentDesignationsStore } from '../../stores/departmentDesignations'
 import IOSButton from '../common/IOSButton.vue'
 import TimeInput from '../common/TimeInput.vue'
 import LoadingIndicator from '../common/LoadingIndicator.vue'
@@ -131,7 +100,6 @@ const emit = defineEmits(['update:modelValue', 'submit', 'cancel'])
 
 // Stores
 const buildingsStore = useBuildingsStore()
-const designationsStore = useDepartmentDesignationsStore()
 
 // Local state
 const isVisible = computed({
@@ -142,7 +110,6 @@ const isVisible = computed({
 const form = ref({
   shiftId: props.shiftId,
   porterId: props.porter?.id || '',
-  designationId: '',
   startTime: new Date(),
   endTime: null
 })
@@ -159,23 +126,11 @@ const departments = computed(() => {
   }))
 })
 
-const designations = computed(() => {
-  return designationsStore.designations
-})
-
 // Load data
 onMounted(async () => {
   // Check if buildings array exists and if not, fetch it
   if (!buildingsStore.buildings || !buildingsStore.buildings.length) {
     await buildingsStore.fetchBuildings()
-  }
-  
-  // The buildings store doesn't have a fetchDepartments method
-  // Departments are loaded as part of fetchBuildings
-  
-  // Check if designations array exists and if not, fetch it
-  if (!designationsStore.designations || !designationsStore.designations.length) {
-    await designationsStore.fetchDesignations()
   }
   
   // If editing, pre-fill form with current assignment data
@@ -185,8 +140,6 @@ onMounted(async () => {
       form.value = {
         shiftId: props.shiftId,
         porterId: props.porter.id,
-        departmentId: activeAssignment.department_id,
-        designationId: activeAssignment.designation_id || '',
         startTime: new Date(activeAssignment.start_time),
         endTime: activeAssignment.end_time ? new Date(activeAssignment.end_time) : null
       }
@@ -217,7 +170,6 @@ const resetForm = () => {
   form.value = {
     shiftId: props.shiftId,
     porterId: props.porter?.id || '',
-    designationId: '',
     startTime: new Date(),
     endTime: null
   }
@@ -230,9 +182,7 @@ const resetForm = () => {
 const validateForm = () => {
   let isValid = true
   
-  // Department validation removed as the field is no longer present
-  
-  // Start time is now optional, so no validation needed
+  // Time validation could be added here if needed in the future
   
   return isValid
 }

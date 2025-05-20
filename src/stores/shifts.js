@@ -344,29 +344,49 @@ export const useShiftsStore = defineStore('shifts', () => {
 
   const assignPorterToDepartment = async (assignment) => {
     try {
-      // First deactivate any existing active assignments for this porter
-      await supabase
-        .from('porter_department_assignments')
-        .update({ is_active: false, updated_at: new Date() })
-        .eq('shift_id', assignment.shiftId)
-        .eq('porter_id', assignment.porterId)
-        .eq('is_active', true)
-      
-      // Prepare assignment data object
-      const assignmentData = {
-        shift_id: assignment.shiftId,
-        porter_id: assignment.porterId,
-        designation_id: assignment.designationId || null,
-        department_id: null, // Always set department_id to null for Department Cover assignments
-        start_time: assignment.startTime || new Date(),
-        end_time: assignment.endTime,
-        is_active: true
+      // When editing an existing assignment, only update the time fields
+      if (assignment.porterId) {
+        // Get the current active assignment
+        const { data: currentAssignments, error: findError } = await supabase
+          .from('porter_department_assignments')
+          .select('*')
+          .eq('shift_id', assignment.shiftId)
+          .eq('porter_id', assignment.porterId)
+          .eq('is_active', true)
+        
+        if (findError) throw findError
+        
+        if (currentAssignments && currentAssignments.length > 0) {
+          // Update existing assignment with new times
+          const { data, error: err } = await supabase
+            .from('porter_department_assignments')
+            .update({
+              start_time: assignment.startTime || new Date(),
+              end_time: assignment.endTime,
+              updated_at: new Date()
+            })
+            .eq('id', currentAssignments[0].id)
+            .select()
+          
+          if (err) throw err
+          return data
+        }
       }
       
-      // Then create the new assignment
+      // If no active assignment exists, this would be a new assignment
+      // which shouldn't happen since we're not allowing department changes anymore
+      // but included for safety
       const { data, error: err } = await supabase
         .from('porter_department_assignments')
-        .insert([assignmentData])
+        .insert([{
+          shift_id: assignment.shiftId,
+          porter_id: assignment.porterId,
+          designation_id: null, // No designation changes allowed
+          department_id: null,
+          start_time: assignment.startTime || new Date(),
+          end_time: assignment.endTime,
+          is_active: true
+        }])
         .select()
       
       if (err) throw err
