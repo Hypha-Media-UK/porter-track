@@ -1,161 +1,158 @@
 <template>
-  <div class="ios-home">
+  <div class="home">
     <!-- Welcome Header -->
-    <div class="ios-home__header">
-      <h1 class="text-h4 font-weight-medium mb-2">Welcome</h1>
-      <p class="text-subtitle-1 text-medium-emphasis">
+    <div class="page-header text-center">
+      <h1 class="page-title">Welcome</h1>
+      <p class="page-description text-gray-600">
         Track hospital porter tasks efficiently
       </p>
     </div>
     
     <!-- Shift Management Section -->
-    <div class="ios-home__shift-section mb-4">
+    <div class="shift-section mb-8">
       <div v-if="shiftsStore.isLoading" class="text-center py-4">
-        <LoadingIndicator />
-        <p class="mt-2 text-medium-emphasis">Loading shift data...</p>
+        <LoadingIndicator label="Loading shift data..." />
       </div>
       
       <template v-else>
         <!-- Active Shift Panel -->
-        <IOSCard v-if="activeShift" class="mb-4">
-          <div class="ios-card-header d-flex justify-space-between align-center">
-            <h2 class="text-h6 font-weight-medium">Current Shift</h2>
-            <StatusBadge status="success" label="Active" />
-          </div>
-          
-          <div class="ios-card-content">
-            <div class="d-flex justify-space-between align-center mb-2">
-              <div>
-                <h3 class="text-h5">{{ activeShift.shift_type }}</h3>
-                <p class="text-subtitle-2 text-medium-emphasis">
-                  Supervisor: {{ activeShift.supervisor?.name || 'N/A' }}
-                </p>
-                <p class="text-subtitle-2 text-medium-emphasis">
-                  Started: {{ formatDateTime(activeShift.start_time) }}
-                </p>
-              </div>
-              
-              <IOSButton
-                color="primary"
-                @click="navigateTo(`/shifts/${activeShift.id}`)"
-              >
-                Manage Shift
-              </IOSButton>
+        <Card v-if="activeShift" class="mb-4">
+          <template #header>
+            <div class="flex-between">
+              <h2 class="card-title">Current Shift</h2>
+              <StatusBadge status="success" label="Active" />
             </div>
+          </template>
+          
+          <div class="flex-between mb-2">
+            <div>
+              <h3 class="fs-xl fw-medium">{{ activeShift.shift_type }}</h3>
+              <p class="fs-sm text-gray-600">
+                Supervisor: {{ activeShift.supervisor?.name || 'N/A' }}
+              </p>
+              <p class="fs-sm text-gray-600">
+                Started: {{ formatDateTime(activeShift.start_time) }}
+              </p>
+            </div>
+            
+            <Button
+              variant="primary"
+              @click="navigateTo(`/shifts/${activeShift.id}`)"
+            >
+              Manage Shift
+            </Button>
           </div>
-        </IOSCard>
+        </Card>
         
         <!-- Start New Shift Button -->
         <div v-if="!activeShift" class="d-flex justify-center mb-5">
-          <IOSButton
-            color="primary"
-            prependIcon="mdi-calendar-plus"
+          <Button
+            variant="primary"
+            iconLeft="+"
             @click="openNewShiftDialog"
           >
             Start New Shift
-          </IOSButton>
+          </Button>
         </div>
         
         <!-- Previous Shifts Section -->
-        <h2 class="text-h6 font-weight-medium mb-3">Previous Shifts</h2>
+        <h2 class="fs-2xl fw-medium mb-3">Previous Shifts</h2>
         
-        <div v-if="recentShifts.length === 0" class="text-center py-4">
-          <p class="text-medium-emphasis">No previous shifts found</p>
+        <div v-if="recentShifts.length === 0" class="empty-state">
+          <p class="text-gray-600">No previous shifts found</p>
         </div>
         
-        <div v-else class="previous-shifts-list mb-5">
-          <IOSCard v-for="shift in recentShifts" :key="shift.id" class="mb-3">
-            <div class="ios-card-content">
-              <div class="d-flex justify-space-between align-center">
-                <div>
-                  <h3 class="text-h6">{{ shift.shift_type }}</h3>
-                  <p class="text-subtitle-2 text-medium-emphasis">
-                    Supervisor: {{ shift.supervisor?.name || 'N/A' }}
-                  </p>
-                  <p class="text-caption text-medium-emphasis">
-                    Ended: {{ formatDateTime(shift.end_time) }}
-                  </p>
-                </div>
-                
-                <IOSButton
-                  color="secondary"
-                  variant="text"
-                  @click="navigateTo(`/shifts/${shift.id}`)"
-                >
-                  View Details
-                </IOSButton>
+        <div v-else class="card-group mb-5">
+          <Card 
+            v-for="shift in recentShifts" 
+            :key="shift.id" 
+            class="mb-3"
+            hover
+          >
+            <div class="flex-between">
+              <div>
+                <h3 class="fs-lg fw-medium">{{ shift.shift_type }}</h3>
+                <p class="fs-sm text-gray-600">
+                  Supervisor: {{ shift.supervisor?.name || 'N/A' }}
+                </p>
+                <p class="fs-xs text-gray-500">
+                  Ended: {{ formatDateTime(shift.end_time) }}
+                </p>
               </div>
+              
+              <Button
+                variant="secondary"
+                @click="navigateTo(`/shifts/${shift.id}`)"
+              >
+                View Details
+              </Button>
             </div>
-          </IOSCard>
+          </Card>
         </div>
         
         <!-- View All Shifts Button -->
-        <div class="d-flex justify-center mb-4">
-          <IOSButton
-            color="secondary"
+        <div class="text-center mb-4">
+          <Button
             variant="text"
-            prependIcon="mdi-history"
+            iconLeft="&#8986;"
             @click="navigateTo('/shifts')"
           >
             View All Archived Shifts
-          </IOSButton>
+          </Button>
         </div>
       </template>
     </div>
     
     <!-- App Information -->
-    <div class="ios-home__info">
-      <p class="text-center text-caption text-medium-emphasis">
-        Porter Track v1.0.0
-      </p>
+    <div class="text-center text-gray-500 fs-xs mt-8">
+      Porter Track v1.0.0
     </div>
     
     <!-- New Shift Dialog -->
-    <v-dialog v-model="newShiftDialogVisible" max-width="500" persistent>
-      <v-card class="ios-dialog">
-        <v-card-title class="text-h5">Start New Shift</v-card-title>
-        <v-card-text>
-          <v-form @submit.prevent="createShift">
-            <v-select
-              v-model="newShift.supervisorId"
-              :items="supervisors"
-              item-title="name"
-              item-value="id"
-              label="Supervisor"
-              variant="outlined"
-              :error-messages="errors.supervisor"
-              required
-            ></v-select>
-            
-            <v-select
-              v-model="newShift.shiftType"
-              :items="['Day Shift', 'Night Shift']"
-              label="Shift Type"
-              variant="outlined"
-              :error-messages="errors.shiftType"
-              required
-            ></v-select>
-          </v-form>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <IOSButton
-            variant="text"
-            color="secondary"
-            @click="newShiftDialogVisible = false"
+    <DialogConfirm
+      v-model="newShiftDialogVisible"
+      title="Start New Shift"
+      confirmText="Start Shift"
+      :showConfirmButton="newShift.supervisorId && newShift.shiftType"
+      @confirm="createShift"
+    >
+      <form @submit.prevent="createShift" class="form">
+        <div class="form-group">
+          <label for="supervisor" class="form-label">Supervisor</label>
+          <select
+            id="supervisor"
+            v-model="newShift.supervisorId"
+            class="form-control"
+            :class="{ 'is-invalid': errors.supervisor }"
+            required
           >
-            Cancel
-          </IOSButton>
-          <IOSButton
-            color="primary"
-            :disabled="!newShift.supervisorId || !newShift.shiftType"
-            @click="createShift"
+            <option v-for="supervisor in supervisors" :key="supervisor.id" :value="supervisor.id">
+              {{ supervisor.name }}
+            </option>
+          </select>
+          <div v-if="errors.supervisor" class="invalid-feedback">
+            {{ errors.supervisor }}
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="shiftType" class="form-label">Shift Type</label>
+          <select
+            id="shiftType"
+            v-model="newShift.shiftType"
+            class="form-control"
+            :class="{ 'is-invalid': errors.shiftType }"
+            required
           >
-            Start Shift
-          </IOSButton>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+            <option value="Day Shift">Day Shift</option>
+            <option value="Night Shift">Night Shift</option>
+          </select>
+          <div v-if="errors.shiftType" class="invalid-feedback">
+            {{ errors.shiftType }}
+          </div>
+        </div>
+      </form>
+    </DialogConfirm>
   </div>
 </template>
 
@@ -164,10 +161,11 @@ import { onMounted, computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useShiftsStore } from '../stores/shifts'
 import { useStaffStore } from '../stores/staff'
-import IOSCard from '../components/common/IOSCard.vue'
-import IOSButton from '../components/common/IOSButton.vue'
+import Card from '../components/common/Card.vue'
+import Button from '../components/common/Button.vue'
 import LoadingIndicator from '../components/common/LoadingIndicator.vue'
 import StatusBadge from '../components/common/StatusBadge.vue'
+import DialogConfirm from '../components/common/DialogConfirm.vue'
 
 const router = useRouter()
 const shiftsStore = useShiftsStore()
@@ -186,7 +184,6 @@ const errors = ref({
 
 // Computed properties
 const activeShift = computed(() => shiftsStore.activeShift)
-const previousShift = computed(() => shiftsStore.previousShift)
 const recentShifts = computed(() => shiftsStore.recentShifts)
 const supervisors = computed(() => staffStore.getSupervisors)
 
@@ -249,40 +246,29 @@ const formatDateTime = (dateString) => {
   })
 }
 
-// No menu items needed anymore as we removed the cards
-
 // Navigation function
 const navigateTo = (path) => {
   router.push(path)
 }
 </script>
 
-<style scoped>
-.ios-home {
+<style lang="scss" scoped>
+.home {
   max-width: 800px;
   margin: 0 auto;
-  padding: 24px 16px;
+  padding: $spacing-6 $spacing-4;
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-.ios-home__header {
-  text-align: center;
-  margin-bottom: 32px;
+.shift-section {
+  @include grid(1, $spacing-4);
 }
 
-/* Previous shifts list styling */
-.previous-shifts-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+@include responsive(md) {
+  .home {
+    padding: $spacing-8 $spacing-6;
+  }
 }
-
-.ios-home__info {
-  margin-top: 24px;
-  padding: 16px;
-}
-
-/* No media queries needed for removed cards */
 </style>

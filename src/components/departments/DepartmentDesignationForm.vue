@@ -1,42 +1,46 @@
 <template>
   <div class="designation-form">
-    <v-form @submit.prevent="submitForm">
-      <v-text-field
-        v-model="form.name"
-        label="Designation Name"
-        variant="outlined"
-        density="comfortable"
-        :error-messages="errors.name"
-        required
-        @update:model-value="errors.name = ''"
-        autofocus
-      ></v-text-field>
+    <form @submit.prevent="submitForm">
+      <div class="form-group">
+        <label for="designation-name" class="form-label">Designation Name</label>
+        <input
+          id="designation-name"
+          v-model="form.name"
+          class="form-control"
+          :class="{ 'is-invalid': errors.name }"
+          placeholder="Enter designation name"
+          @input="errors.name = ''"
+          ref="nameInput"
+        />
+        <div v-if="errors.name" class="invalid-feedback">
+          {{ errors.name }}
+        </div>
+      </div>
       
-      <div class="designation-form__actions">
-        <v-spacer></v-spacer>
-        <IOSButton
+      <div class="form-actions">
+        <Button
           variant="text"
-          color="secondary"
           class="mr-2"
           @click="$emit('cancel')"
         >
           Cancel
-        </IOSButton>
-        <IOSButton
-          color="primary"
-          :disabled="!form.name"
+        </Button>
+        
+        <Button
+          variant="primary"
+          :disabled="!form.name.trim()"
           @click="submitForm"
         >
           {{ isEdit ? 'Update' : 'Add' }}
-        </IOSButton>
+        </Button>
       </div>
-    </v-form>
+    </form>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, watch } from 'vue'
-import IOSButton from '../common/IOSButton.vue'
+import { ref, watch, nextTick } from 'vue'
+import Button from '../common/Button.vue'
 
 const props = defineProps({
   designation: {
@@ -49,7 +53,7 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['submit', 'cancel'])
+const emit = defineEmits(['submit', 'cancel', 'update:designation'])
 
 const form = ref({
   name: props.designation?.name || ''
@@ -59,9 +63,23 @@ const errors = ref({
   name: ''
 })
 
+const nameInput = ref(null)
+
+// Focus input field when mounted
+nextTick(() => {
+  if (nameInput.value) {
+    nameInput.value.focus()
+  }
+})
+
 // Watch for changes to the designation prop
 watch(() => props.designation, (newVal) => {
   form.value.name = newVal?.name || ''
+}, { deep: true })
+
+// Watch for form changes to emit updates
+watch(() => form.value, (newVal) => {
+  emit('update:designation', { ...props.designation, ...newVal })
 }, { deep: true })
 
 // Submit form handler
@@ -87,14 +105,53 @@ const validateForm = () => {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .designation-form {
   max-width: 600px;
-}
-
-.designation-form__actions {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 16px;
+  
+  .form-group {
+    margin-bottom: $spacing-4;
+  }
+  
+  .form-label {
+    display: block;
+    font-weight: $font-weight-medium;
+    margin-bottom: $spacing-2;
+  }
+  
+  .form-control {
+    width: 100%;
+    padding: $spacing-2 $spacing-3;
+    border: 1px solid $color-gray-300;
+    border-radius: $border-radius;
+    font-size: $font-size-md;
+    transition: $transition-base;
+    
+    &:focus {
+      border-color: $color-primary;
+      outline: none;
+      box-shadow: 0 0 0 2px rgba($color-primary, 0.25);
+    }
+    
+    &.is-invalid {
+      border-color: $color-error;
+    }
+  }
+  
+  .invalid-feedback {
+    color: $color-error;
+    font-size: $font-size-sm;
+    margin-top: $spacing-1;
+  }
+  
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: $spacing-4;
+  }
+  
+  .mr-2 {
+    margin-right: $spacing-2;
+  }
 }
 </style>

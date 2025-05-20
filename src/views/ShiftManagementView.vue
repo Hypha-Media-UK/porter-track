@@ -1,61 +1,59 @@
 <template>
   <div class="shift-management">
-    <div class="shift-management__header">
-      <h1 class="text-h4 font-weight-medium mb-1">Shift Management</h1>
-      <p class="text-body-1 text-medium-emphasis">Manage porter shifts and tasks</p>
+    <div class="page-header">
+      <h1 class="page-title">Shift Management</h1>
+      <p class="page-description text-gray-600">Manage porter shifts and tasks</p>
     </div>
     
     <!-- Loading State -->
     <div v-if="shiftsStore.isLoading" class="text-center py-6">
-      <LoadingIndicator :size="64" />
-      <p class="mt-2 text-medium-emphasis">Loading shift data...</p>
+      <LoadingIndicator size="lg" variant="primary" label="Loading shift data..." />
     </div>
     
     <!-- Shift Details -->
     <template v-else-if="shiftDetails">
       <div class="shift-management__overview">
-        <IOSCard>
-          <div class="ios-card-header">
-            <div class="d-flex justify-space-between align-center">
-              <h2 class="text-h5 font-weight-medium">{{ shiftDetails.shift_type }}</h2>
-              <StatusBadge :status="shiftDetails.is_active ? 'success' : 'completed'" :label="shiftDetails.is_active ? 'Active' : 'Completed'" />
+        <Card>
+          <template #header>
+            <div class="flex-between">
+              <h2 class="card-title">{{ shiftDetails.shift_type }}</h2>
+              <StatusBadge :status="shiftDetails.is_active ? 'success' : 'info'" :label="shiftDetails.is_active ? 'Active' : 'Completed'" />
             </div>
-          </div>
+          </template>
           
-          <div class="ios-card-content">
-            <div class="grid-container">
+          <div class="card-body">
+            <div class="grid grid-cols-2 gap-4">
               <div class="grid-item">
-                <p class="text-subtitle-2 text-medium-emphasis mb-1">Supervisor</p>
-                <p class="text-h6">{{ shiftDetails.supervisor?.name || 'N/A' }}</p>
+                <p class="fs-sm text-gray-600 mb-1">Supervisor</p>
+                <p class="fs-lg fw-medium">{{ shiftDetails.supervisor?.name || 'N/A' }}</p>
               </div>
               
               <div class="grid-item">
-                <p class="text-subtitle-2 text-medium-emphasis mb-1">Start Time</p>
-                <p class="text-h6">{{ formatDateTime(shiftDetails.start_time) }}</p>
+                <p class="fs-sm text-gray-600 mb-1">Start Time</p>
+                <p class="fs-lg fw-medium">{{ formatDateTime(shiftDetails.start_time) }}</p>
               </div>
               
               <div class="grid-item">
-                <p class="text-subtitle-2 text-medium-emphasis mb-1">End Time</p>
-                <p class="text-h6">{{ shiftDetails.end_time ? formatDateTime(shiftDetails.end_time) : 'Ongoing' }}</p>
+                <p class="fs-sm text-gray-600 mb-1">End Time</p>
+                <p class="fs-lg fw-medium">{{ shiftDetails.end_time ? formatDateTime(shiftDetails.end_time) : 'Ongoing' }}</p>
               </div>
               
               <div class="grid-item">
-                <p class="text-subtitle-2 text-medium-emphasis mb-1">Duration</p>
-                <p class="text-h6">{{ calculateDuration(shiftDetails.start_time, shiftDetails.end_time) }}</p>
+                <p class="fs-sm text-gray-600 mb-1">Duration</p>
+                <p class="fs-lg fw-medium">{{ calculateDuration(shiftDetails.start_time, shiftDetails.end_time) }}</p>
               </div>
             </div>
             
-            <div v-if="shiftDetails.is_active" class="mt-4 d-flex justify-end">
-              <IOSButton
-                color="error"
-                variant="outlined"
+            <div v-if="shiftDetails.is_active" class="mt-4 text-right">
+              <Button
+                variant="error"
                 @click="confirmEndShift"
               >
                 End Shift
-              </IOSButton>
+              </Button>
             </div>
           </div>
-        </IOSCard>
+        </Card>
       </div>
       
       <!-- Stats Section -->
@@ -64,22 +62,22 @@
           <StatisticCard
             title="Porters on Shift"
             :value="shiftDetails.porters?.length || 0"
-            icon="mdi-account-group"
+            icon="users"
             color="primary"
           />
           
           <StatisticCard
             title="Pending Tasks"
             :value="pendingTasks.length"
-            icon="mdi-clock-outline"
+            icon="clock"
             color="warning"
           />
           
           <StatisticCard
             title="Completed Tasks"
             :value="completedTasks.length"
-            icon="mdi-check-circle-outline"
-            color="success"
+            icon="check"
+            color="accent"
           />
         </div>
       </div>
@@ -112,65 +110,66 @@
     
     <!-- No Active Shift State -->
     <template v-else>
-      <div class="text-center py-6">
-        <v-icon icon="mdi-calendar-clock" size="x-large" color="primary" class="mb-4"></v-icon>
-        <h3 class="text-h5 mb-2">No shift selected</h3>
-        <p class="mb-4">Please start a new shift or select an existing one</p>
-        <IOSButton
-          color="primary"
-          @click="startNewShift"
-        >
-          Start New Shift
-        </IOSButton>
+      <div class="empty-state">
+        <span class="empty-state-icon">📅</span>
+        <h3 class="empty-state-title">No shift selected</h3>
+        <p class="empty-state-message">Please start a new shift or select an existing one</p>
+        <div class="empty-state-actions">
+          <Button
+            variant="primary"
+            @click="startNewShift"
+          >
+            Start New Shift
+          </Button>
+        </div>
       </div>
     </template>
     
     <!-- New Shift Dialog -->
-    <v-dialog v-model="newShiftDialogVisible" max-width="500" persistent>
-      <v-card class="ios-dialog">
-        <v-card-title class="text-h5">Start New Shift</v-card-title>
-        <v-card-text>
-          <v-form @submit.prevent="createShift">
-            <v-select
-              v-model="newShift.supervisorId"
-              :items="supervisors"
-              item-title="name"
-              item-value="id"
-              label="Supervisor"
-              variant="outlined"
-              :error-messages="errors.supervisor"
-              required
-            ></v-select>
-            
-            <v-select
-              v-model="newShift.shiftType"
-              :items="['Day Shift', 'Night Shift']"
-              label="Shift Type"
-              variant="outlined"
-              :error-messages="errors.shiftType"
-              required
-            ></v-select>
-          </v-form>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <IOSButton
-            variant="text"
-            color="secondary"
-            @click="newShiftDialogVisible = false"
+    <DialogConfirm
+      v-model="newShiftDialogVisible"
+      title="Start New Shift"
+      confirmText="Start Shift"
+      :showConfirmButton="newShift.supervisorId && newShift.shiftType"
+      @confirm="createShift"
+    >
+      <form @submit.prevent="createShift" class="form">
+        <div class="form-group">
+          <label for="supervisor" class="form-label">Supervisor</label>
+          <select
+            id="supervisor"
+            v-model="newShift.supervisorId"
+            class="form-control"
+            :class="{ 'is-invalid': errors.supervisor }"
+            required
           >
-            Cancel
-          </IOSButton>
-          <IOSButton
-            color="primary"
-            :disabled="!newShift.supervisorId || !newShift.shiftType"
-            @click="createShift"
+            <option v-for="supervisor in supervisors" :key="supervisor.id" :value="supervisor.id">
+              {{ supervisor.name }}
+            </option>
+          </select>
+          <div v-if="errors.supervisor" class="invalid-feedback">
+            {{ errors.supervisor }}
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label for="shiftType" class="form-label">Shift Type</label>
+          <select
+            id="shiftType"
+            v-model="newShift.shiftType"
+            class="form-control"
+            :class="{ 'is-invalid': errors.shiftType }"
+            required
           >
-            Start Shift
-          </IOSButton>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+            <option value="Day Shift">Day Shift</option>
+            <option value="Night Shift">Night Shift</option>
+          </select>
+          <div v-if="errors.shiftType" class="invalid-feedback">
+            {{ errors.shiftType }}
+          </div>
+        </div>
+      </form>
+    </DialogConfirm>
     
     <!-- End Shift Confirmation Dialog -->
     <DialogConfirm
@@ -179,30 +178,26 @@
       message="Are you sure you want to end this shift? This action cannot be undone."
       cancel-text="Cancel"
       confirm-text="End Shift"
-      confirm-color="error"
+      confirm-variant="error"
       @confirm="endShift"
     />
     
     <!-- Department Select Dialog -->
-    <v-dialog
+    <DialogConfirm
       v-model="departmentSelectDialogVisible"
-      max-width="500"
-      persistent
+      title="Select Department"
+      showCloseButton
     >
-      <v-card class="ios-dialog">
-        <v-card-text>
-          <DepartmentSelectForm
-            :porter="selectedPorter"
-            :departments="buildingsStore.departments"
-            :designations="designationsStore.designations"
-            :is-loading="isLoadingPorters"
-            :shift-id="shiftId"
-            @submit="assignPorterToDepartment"
-            @cancel="departmentSelectDialogVisible = false"
-          />
-        </v-card-text>
-      </v-card>
-    </v-dialog>
+      <DepartmentSelectForm
+        :porter="selectedPorter"
+        :departments="buildingsStore.departments"
+        :designations="designationsStore.designations"
+        :is-loading="isLoadingPorters"
+        :shift-id="shiftId"
+        @submit="assignPorterToDepartment"
+        @cancel="departmentSelectDialogVisible = false"
+      />
+    </DialogConfirm>
     
     <!-- Porter Assignment Dialog -->
     <PorterAssignmentForm
@@ -222,7 +217,7 @@
       message="Are you sure you want to remove this porter from the shift? All their assignments will be deleted."
       cancel-text="Cancel"
       confirm-text="Remove"
-      confirm-color="error"
+      confirm-variant="error"
       @confirm="removePorterFromShift"
     />
     
@@ -233,7 +228,7 @@
       message="Are you sure you want to end this porter's current department assignment?"
       cancel-text="Cancel"
       confirm-text="End Assignment"
-      confirm-color="warning"
+      confirm-variant="warning"
       @confirm="removePorterAssignment"
     />
   </div>
@@ -244,14 +239,13 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useShiftsStore } from '../stores/shifts'
 import { useStaffStore } from '../stores/staff'
-import IOSCard from '../components/common/IOSCard.vue'
-import IOSButton from '../components/common/IOSButton.vue'
+import Card from '../components/common/Card.vue'
+import Button from '../components/common/Button.vue'
 import LoadingIndicator from '../components/common/LoadingIndicator.vue'
 import DialogConfirm from '../components/common/DialogConfirm.vue'
 import StatisticCard from '../components/common/StatisticCard.vue'
 import StatusBadge from '../components/common/StatusBadge.vue'
 import PortersOnShift from '../components/porters/PortersOnShift.vue'
-import AddPorterDialog from '../components/porters/AddPorterDialog.vue'
 import PorterAssignmentForm from '../components/porters/PorterAssignmentForm.vue'
 import DepartmentGrid from '../components/departments/DepartmentGrid.vue'
 import DepartmentSelectForm from '../components/departments/DepartmentSelectForm.vue'
@@ -550,40 +544,28 @@ const editPorterTimes = (porter) => {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .shift-management {
   max-width: 1000px;
   margin: 0 auto;
-  padding: 16px;
-}
-
-.shift-management__header {
-  margin-bottom: 24px;
+  padding: $spacing-4;
+  
+  @include responsive(md) {
+    padding: $spacing-6;
+  }
 }
 
 .stats-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 16px;
+  @include grid-responsive(300px, $spacing-4);
+  margin-top: $spacing-6;
+  margin-bottom: $spacing-6;
 }
 
-.grid-container {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-gap: 16px;
+.shift-management__porter-section {
+  margin-top: $spacing-8;
 }
 
 .grid-item {
   min-width: 0;
-}
-
-@media (max-width: 600px) {
-  .grid-container {
-    grid-template-columns: 1fr;
-  }
-  
-  .stats-grid {
-    grid-template-columns: 1fr;
-  }
 }
 </style>

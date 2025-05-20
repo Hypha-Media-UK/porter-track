@@ -1,44 +1,48 @@
 <template>
-  <IOSCard class="porters-on-shift">
-    <div class="ios-card-header d-flex justify-space-between align-center">
-      <h2 class="text-h6 font-weight-medium">Porters on Shift</h2>
-      <div class="d-flex align-center">
-        <v-select
-          v-model="selectedPorterId"
-          :items="availablePorters"
-          item-title="name"
-          item-value="id"
-          label="Select Porter"
-          variant="outlined"
-          density="compact"
-          hide-details
-          class="porter-select mr-2"
-          :disabled="!isShiftActive || isLoading || availablePorters.length === 0"
-        ></v-select>
-        <IOSButton
-          color="primary"
-          size="small"
-          :disabled="!isShiftActive || !selectedPorterId || isLoading"
-          @click="addPorter"
-          :loading="isLoading"
-        >
-          Add Porter
-        </IOSButton>
+  <Card class="porters-on-shift">
+    <template #header>
+      <div class="flex-between">
+        <h2 class="card-title">Porters on Shift</h2>
+        <div class="porter-controls">
+          <div class="form-group mb-0 mr-2">
+            <select
+              v-model="selectedPorterId"
+              class="form-control form-control-sm"
+              :disabled="!isShiftActive || isLoading || availablePorters.length === 0"
+            >
+              <option value="">Select Porter</option>
+              <option 
+                v-for="porter in availablePorters" 
+                :key="porter.id" 
+                :value="porter.id"
+              >
+                {{ porter.name }}
+              </option>
+            </select>
+          </div>
+          <Button
+            variant="primary"
+            size="sm"
+            :disabled="!isShiftActive || !selectedPorterId || isLoading"
+            @click="addPorter"
+          >
+            Add Porter
+          </Button>
+        </div>
       </div>
-    </div>
+    </template>
     
-    <div class="ios-card-content">
+    <div class="card-body">
       <!-- Loading State -->
       <div v-if="isLoading" class="text-center py-4">
-        <LoadingIndicator />
-        <p class="mt-2 text-medium-emphasis">Loading porters...</p>
+        <LoadingIndicator label="Loading porters..." />
       </div>
       
       <!-- Empty State -->
-      <div v-else-if="unassignedPorters.length === 0" class="text-center py-4">
-        <v-icon icon="mdi-account-question" size="large" color="info" class="mb-3"></v-icon>
-        <h3 class="text-h6 mb-1">No Unassigned Porters</h3>
-        <p class="text-body-2">
+      <div v-else-if="unassignedPorters.length === 0" class="empty-state">
+        <span class="empty-state-icon">👤</span>
+        <h3 class="empty-state-title">No Unassigned Porters</h3>
+        <p class="empty-state-message">
           {{ availablePorters.length === 0 ? 
             'Use the dropdown above to add porters to this shift.' : 
             'All porters are currently assigned to departments.' }}
@@ -52,57 +56,49 @@
           :key="porter.id"
           class="porter-item"
         >
-          <div class="d-flex align-center justify-space-between">
-            <div class="d-flex align-center">
-              <v-avatar size="32" color="primary" class="mr-2">
-                <v-icon icon="mdi-account" color="white"></v-icon>
-              </v-avatar>
-              <div class="porter-info">
-                <div class="text-subtitle-1">{{ porter.name }}</div>
-                <div class="text-caption text-medium-emphasis">{{ porter.type }}</div>
+          <div class="flex-between">
+            <div class="porter-info">
+              <div class="porter-avatar">
+                <span class="icon">👤</span>
+              </div>
+              <div>
+                <div class="porter-name">{{ porter.name }}</div>
+                <div class="porter-type">{{ porter.type }}</div>
               </div>
             </div>
             
             <div class="porter-actions">
-              <v-btn
+              <Button
                 v-if="isShiftActive"
                 variant="text"
-                color="primary"
-                size="small"
-                icon="mdi-office-building-marker"
+                size="sm"
+                iconLeft="📍"
                 @click="$emit('assign-porter', porter)"
                 :disabled="isLoading"
-              >
-                <v-tooltip activator="parent" location="top">
-                  Assign to Department
-                </v-tooltip>
-              </v-btn>
+                title="Assign to Department"
+              />
               
-              <v-btn
+              <Button
                 v-if="isShiftActive"
                 variant="text"
-                color="error"
-                size="small"
-                icon="mdi-account-remove"
+                size="sm"
+                iconLeft="❌"
                 @click="$emit('remove-porter', porter)"
                 :disabled="isLoading"
-              >
-                <v-tooltip activator="parent" location="top">
-                  Remove from Shift
-                </v-tooltip>
-              </v-btn>
+                title="Remove from Shift"
+              />
             </div>
           </div>
         </div>
       </div>
     </div>
-  </IOSCard>
+  </Card>
 </template>
 
 <script setup>
 import { ref, computed, watch } from 'vue'
-import IOSCard from '../common/IOSCard.vue'
-import IOSButton from '../common/IOSButton.vue'
+import Card from '../common/Card.vue'
+import Button from '../common/Button.vue'
 import LoadingIndicator from '../common/LoadingIndicator.vue'
 
 const props = defineProps({
@@ -167,14 +163,14 @@ const addPorter = () => {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .porters-on-shift {
-  margin-bottom: 20px;
+  margin-bottom: $spacing-5;
 }
 
-.porter-select {
-  width: 200px;
-  max-width: 200px;
+.porter-controls {
+  display: flex;
+  align-items: center;
 }
 
 .porters-list {
@@ -183,44 +179,68 @@ const addPorter = () => {
 }
 
 .porter-item {
-  padding: 12px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
-  transition: background-color 0.2s ease;
-}
-
-.porter-item:last-child {
-  border-bottom: none;
-}
-
-.porter-item:hover {
-  background-color: rgba(0, 0, 0, 0.04);
+  padding: $spacing-3;
+  border-bottom: 1px solid $color-gray-200;
+  transition: $transition-base;
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  &:hover {
+    background-color: $color-gray-100;
+  }
 }
 
 .porter-info {
-  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: $spacing-3;
 }
 
-@media (prefers-color-scheme: dark) {
-  .porter-item {
-    border-bottom-color: rgba(255, 255, 255, 0.12);
-  }
-  
-  .porter-item:hover {
-    background-color: rgba(255, 255, 255, 0.04);
-  }
+.porter-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: $color-primary;
+  color: $color-white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-@media (max-width: 600px) {
-  .ios-card-header {
+.porter-name {
+  font-weight: $font-weight-medium;
+  font-size: $font-size-sm;
+}
+
+.porter-type {
+  font-size: $font-size-xs;
+  color: $color-gray-600;
+}
+
+.porter-actions {
+  display: flex;
+  gap: $spacing-1;
+}
+
+@include responsive(sm) {
+  .flex-between {
     flex-direction: column;
     align-items: flex-start;
+    gap: $spacing-3;
   }
   
-  .porter-select {
+  .porter-controls {
     width: 100%;
-    max-width: 100%;
-    margin-bottom: 12px;
-    margin-right: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: $spacing-2;
+    
+    .form-group {
+      width: 100%;
+      margin-right: 0;
+    }
   }
 }
 </style>

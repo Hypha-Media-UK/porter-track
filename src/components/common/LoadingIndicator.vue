@@ -1,31 +1,64 @@
 <template>
-  <div class="text-center" v-if="show">
-    <v-progress-circular 
-      :indeterminate="true" 
-      :color="color" 
-      :size="size"
-    ></v-progress-circular>
-    <p v-if="message" class="mt-2">{{ message }}</p>
+  <div class="loading-container" :class="{ 'text-center': center }">
+    <div v-if="type === 'spinner'" :class="spinnerClasses"></div>
+    <div v-else-if="type === 'dots'" :class="dotsClasses">
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+    <div v-if="label" class="loading-label mt-2">{{ label }}</div>
   </div>
 </template>
 
-<script setup>
-defineProps({
-  show: {
-    type: Boolean,
-    default: true
+<script>
+export default {
+  name: 'LoadingIndicator',
+  props: {
+    type: {
+      type: String,
+      default: 'spinner',
+      validator: (value) => ['spinner', 'dots'].includes(value)
+    },
+    size: {
+      type: String,
+      default: 'md',
+      validator: (value) => ['sm', 'md', 'lg'].includes(value)
+    },
+    variant: {
+      type: String,
+      default: 'primary',
+      validator: (value) => ['primary', 'secondary', 'accent', 'warning', 'error'].includes(value)
+    },
+    label: {
+      type: String,
+      default: ''
+    },
+    center: {
+      type: Boolean,
+      default: false
+    }
   },
-  color: {
-    type: String,
-    default: 'primary'
-  },
-  size: {
-    type: Number,
-    default: 32
-  },
-  message: {
-    type: String,
-    default: 'Loading...'
+  computed: {
+    spinnerClasses() {
+      return [
+        'loading-spinner',
+        `spinner-${this.variant}`,
+        {
+          'spinner-sm': this.size === 'sm',
+          'spinner-lg': this.size === 'lg'
+        }
+      ];
+    },
+    dotsClasses() {
+      return [
+        'loading-dots',
+        `dots-${this.variant}`,
+        {
+          'dots-sm': this.size === 'sm',
+          'dots-lg': this.size === 'lg'
+        }
+      ];
+    }
   }
-})
+};
 </script>

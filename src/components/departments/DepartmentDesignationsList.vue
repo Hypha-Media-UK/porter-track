@@ -1,40 +1,41 @@
 <template>
   <div class="designations-list">
-    <IOSCard>
-      <div class="ios-card-header">
-        <h2 class="text-h6 font-weight-medium">Department Designations</h2>
-        <AddButton
-          color="primary"
-          @click="openAddDesignationDialog"
-        />
-      </div>
+    <Card>
+      <template #header>
+        <div class="flex-between">
+          <h2 class="card-title">Department Designations</h2>
+          <Button
+            variant="primary"
+            iconLeft="+"
+            @click="openAddDesignationDialog"
+            title="Add new designation"
+          />
+        </div>
+      </template>
       
       <div class="inset-content">
         <!-- Loading State -->
         <div v-if="isLoading" class="text-center py-4">
-          <LoadingIndicator />
+          <LoadingIndicator label="Loading designations..." />
         </div>
         
         <!-- Empty State -->
-        <div v-else-if="!designations.length" class="text-center py-4">
-          <EmptyState
-            icon="mdi-tag-outline"
-            title="No Designations"
-            message="Department designations help classify porter assignments"
+        <div v-else-if="!designations.length" class="empty-state py-4">
+          <span class="icon empty-state-icon">🏷️</span>
+          <h3 class="empty-state-title">No Designations</h3>
+          <p class="text-gray-600 mb-3">Department designations help classify porter assignments</p>
+          <Button
+            variant="primary"
+            iconLeft="+"
+            @click="openAddDesignationDialog"
           >
-            <IOSButton
-              color="primary"
-              prependIcon="mdi-plus"
-              @click="openAddDesignationDialog"
-            >
-              Add Designation
-            </IOSButton>
-          </EmptyState>
+            Add Designation
+          </Button>
         </div>
         
         <!-- Designations List -->
         <div v-else>
-          <IOSListItem
+          <ListItem
             v-for="designation in designations"
             :key="designation.id"
             :model-value="designation.name"
@@ -46,33 +47,33 @@
           />
         </div>
       </div>
-    </IOSCard>
+    </Card>
     
     <!-- Add/Edit Dialog -->
-    <v-dialog v-model="designationDialogVisible" max-width="500" persistent>
-      <v-card class="ios-dialog">
-        <v-card-title class="text-h5">
-          {{ isEditMode ? 'Edit Designation' : 'Add Designation' }}
-        </v-card-title>
-        <v-card-text>
-          <DepartmentDesignationForm
-            :designation="currentDesignation"
-            :is-edit="isEditMode"
-            @submit="saveDesignation"
-            @cancel="designationDialogVisible = false"
-          />
-        </v-card-text>
-      </v-card>
-    </v-dialog>
+    <DialogConfirm
+      v-if="currentDesignation"
+      v-model="designationDialogVisible"
+      :title="isEditMode ? 'Edit Designation' : 'Add Designation'"
+      :showConfirmButton="!!currentDesignation.name"
+      confirmText="Save"
+      @confirm="saveDesignation(currentDesignation)"
+      @cancel="designationDialogVisible = false"
+    >
+      <DepartmentDesignationForm
+        :designation="currentDesignation"
+        :is-edit="isEditMode"
+        @update:designation="currentDesignation = $event"
+      />
+    </DialogConfirm>
     
     <!-- Delete Confirmation Dialog -->
     <DialogConfirm
       v-model="deleteDialogVisible"
       title="Confirm Deletion"
       message="Are you sure you want to delete this department designation? This action cannot be undone."
-      cancel-text="Cancel"
-      confirm-text="Delete"
-      confirm-color="error"
+      cancelText="Cancel"
+      confirmText="Delete"
+      confirmVariant="error"
       @confirm="deleteDesignation"
     />
   </div>
@@ -81,12 +82,10 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useDepartmentDesignationsStore } from '../../stores/departmentDesignations'
-import IOSCard from '../common/IOSCard.vue'
-import IOSListItem from '../common/IOSListItem.vue'
-import IOSButton from '../common/IOSButton.vue'
-import AddButton from '../common/AddButton.vue'
+import Card from '../common/Card.vue'
+import ListItem from '../common/ListItem.vue'
+import Button from '../common/Button.vue'
 import LoadingIndicator from '../common/LoadingIndicator.vue'
-import EmptyState from '../common/EmptyState.vue'
 import DialogConfirm from '../common/DialogConfirm.vue'
 import DepartmentDesignationForm from './DepartmentDesignationForm.vue'
 
@@ -161,8 +160,39 @@ const deleteDesignation = async () => {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .designations-list {
-  margin-bottom: 24px;
+  margin-bottom: $spacing-6;
+}
+
+.inset-content {
+  padding: $spacing-2;
+  background-color: $color-gray-100;
+  border-radius: $border-radius;
+}
+
+.card-title {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  
+  .empty-state-icon {
+    font-size: 2rem;
+    margin-bottom: $spacing-3;
+    color: $color-gray-400;
+  }
+  
+  .empty-state-title {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-medium;
+    margin-bottom: $spacing-2;
+  }
 }
 </style>

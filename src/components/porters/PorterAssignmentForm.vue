@@ -1,77 +1,58 @@
 <template>
-  <v-dialog
+  <DialogConfirm
     v-model="isVisible"
-    max-width="500"
-    persistent
-    @update:model-value="updateVisibility"
+    :title="isEdit ? 'Update Porter Assignment Times' : 'Add Porter to Department'"
+    :showCancelButton="true"
+    :showConfirmButton="!isLoading"
+    confirmText="Save"
+    @update:modelValue="updateVisibility"
+    @confirm="submitForm"
+    @cancel="cancel"
   >
-    <v-card class="ios-dialog">
-      <v-card-title class="text-h5">
-        {{ isEdit ? 'Update Porter Assignment Times' : 'Add Porter to Department' }}
-      </v-card-title>
-      
-      <v-card-text>
-        <div v-if="isLoading" class="text-center py-4">
-          <LoadingIndicator />
-          <p class="mt-2 text-medium-emphasis">Loading data...</p>
+    <div v-if="isLoading" class="text-center py-4">
+      <LoadingIndicator label="Loading data..." />
+    </div>
+    
+    <div v-else>
+      <!-- Porter Info -->
+      <div class="porter-info mb-4 border-bottom pb-3">
+        <div class="flex-start">
+          <div class="porter-avatar">
+            <span class="icon">👤</span>
+          </div>
+          <div>
+            <div class="porter-name">{{ porter?.name }}</div>
+            <div class="porter-type text-gray-600">{{ porter?.type }}</div>
+          </div>
         </div>
-        
-        <v-form v-else @submit.prevent="submitForm">
-          <!-- Porter Info -->
-          <div class="porter-info mb-4 pb-2 border-bottom">
-            <div class="d-flex align-center">
-              <v-avatar size="32" color="primary" class="mr-2">
-                <v-icon icon="mdi-account" color="white"></v-icon>
-              </v-avatar>
-              <div class="text-h6">{{ porter?.name }}</div>
-            </div>
-          </div>
-          
-          <!-- Time Fields -->
-          <div class="time-fields">
-            <TimeInput
-              v-model="form.startTime"
-              label="Start Time (Optional)"
-              :error="errors.startTime"
-              class="mb-2"
-            />
-            
-            <TimeInput
-              v-model="form.endTime"
-              label="End Time (Optional)"
-              :show-now-button="false"
-            />
-          </div>
-        </v-form>
-      </v-card-text>
+      </div>
       
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <IOSButton
-          variant="text"
-          color="secondary"
-          @click="cancel"
-        >
-          Cancel
-        </IOSButton>
-        <IOSButton
-          color="primary"
-          :disabled="isLoading"
-          @click="submitForm"
-        >
-          {{ isEdit ? 'Update' : 'Assign' }}
-        </IOSButton>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+      <!-- Time Fields -->
+      <div class="time-fields">
+        <TimeInput
+          v-model="form.startTime"
+          label="Start Time (Optional)"
+          :error="errors.startTime"
+          class="mb-3"
+        />
+        
+        <TimeInput
+          v-model="form.endTime"
+          label="End Time (Optional)"
+          :show-now-button="false"
+        />
+      </div>
+    </div>
+  </DialogConfirm>
 </template>
 
 <script setup>
 import { ref, computed, watch, onMounted } from 'vue'
 import { useBuildingsStore } from '../../stores/buildings'
-import IOSButton from '../common/IOSButton.vue'
+import Button from '../common/Button.vue'
 import TimeInput from '../common/TimeInput.vue'
 import LoadingIndicator from '../common/LoadingIndicator.vue'
+import DialogConfirm from '../common/DialogConfirm.vue'
 
 const props = defineProps({
   modelValue: {
@@ -200,14 +181,38 @@ const cancel = () => {
 }
 </script>
 
-<style scoped>
-.border-bottom {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+<style lang="scss" scoped>
+.porter-info {
+  display: flex;
+  align-items: center;
 }
 
-@media (prefers-color-scheme: dark) {
-  .border-bottom {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-  }
+.border-bottom {
+  border-bottom: 1px solid $color-gray-200;
+}
+
+.porter-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background-color: $color-primary;
+  color: $color-white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: $spacing-3;
+}
+
+.porter-name {
+  font-weight: $font-weight-medium;
+  font-size: $font-size-md;
+}
+
+.porter-type {
+  font-size: $font-size-xs;
+}
+
+.time-fields {
+  margin-bottom: $spacing-4;
 }
 </style>

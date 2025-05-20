@@ -1,0 +1,155 @@
+// Responsive breakpoints
+@mixin responsive($breakpoint) {
+  @if $breakpoint == sm {
+    @media (min-width: $breakpoint-sm) {
+      @content;
+    }
+  } @else if $breakpoint == md {
+    @media (min-width: $breakpoint-md) {
+      @content;
+    }
+  } @else if $breakpoint == lg {
+    @media (min-width: $breakpoint-lg) {
+      @content;
+    }
+  } @else if $breakpoint == xl {
+    @media (min-width: $breakpoint-xl) {
+      @content;
+    }
+  } @else if $breakpoint == xxl {
+    @media (min-width: $breakpoint-xxl) {
+      @content;
+    }
+  }
+}
+
+// Flexbox utilities
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+@mixin flex-column {
+  display: flex;
+  flex-direction: column;
+}
+
+// Grid utilities
+@mixin grid($columns: 1, $gap: $spacing-4) {
+  display: grid;
+  grid-template-columns: repeat($columns, 1fr);
+  gap: $gap;
+}
+
+@mixin grid-responsive($min-width: 250px, $gap: $spacing-4) {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax($min-width, 1fr));
+  gap: $gap;
+}
+
+// Typography
+@mixin heading-1 {
+  font-size: $font-size-5xl;
+  line-height: $line-height-heading;
+  font-weight: $font-weight-bold;
+}
+
+@mixin heading-2 {
+  font-size: $font-size-4xl;
+  line-height: $line-height-heading;
+  font-weight: $font-weight-bold;
+}
+
+@mixin heading-3 {
+  font-size: $font-size-3xl;
+  line-height: $line-height-heading;
+  font-weight: $font-weight-bold;
+}
+
+@mixin heading-4 {
+  font-size: $font-size-2xl;
+  line-height: $line-height-heading;
+  font-weight: $font-weight-medium;
+}
+
+@mixin heading-5 {
+  font-size: $font-size-xl;
+  line-height: $line-height-heading;
+  font-weight: $font-weight-medium;
+}
+
+@mixin heading-6 {
+  font-size: $font-size-lg;
+  line-height: $line-height-heading;
+  font-weight: $font-weight-medium;
+}
+
+@mixin text-small {
+  font-size: $font-size-sm;
+  line-height: $line-height-base;
+}
+
+@mixin text-tiny {
+  font-size: $font-size-xs;
+  line-height: $line-height-base;
+}
+
+// Common components
+@mixin card {
+  background-color: $color-white;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-sm;
+  padding: $spacing-4;
+  transition: $transition-base;
+  
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+}
+
+@mixin button-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  line-height: 1;
+  border-radius: $border-radius-md;
+  padding: $spacing-2 $spacing-4;
+  cursor: pointer;
+  transition: $transition-base;
+  border: none;
+  text-decoration: none;
+  
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// For hiding elements visually but keeping them accessible for screen readers
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+// For truncating text with ellipsis
+@mixin text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

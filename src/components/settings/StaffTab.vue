@@ -1,53 +1,56 @@
 <template>
   <section class="staff-tab">
     <!-- Actions -->
-    <div class="d-flex justify-end mb-4"></div>
+    <div class="flex-end mb-4"></div>
     
     <!-- Loading Indicator -->
     <div v-if="staffStore.isLoading" class="text-center py-6">
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
-      <p class="mt-2 text-medium-emphasis">Loading staff...</p>
+      <LoadingIndicator label="Loading staff..." />
     </div>
     
     <!-- Empty State (when no staff at all) -->
-    <IOSCard v-else-if="!staffStore.staff.length">
-      <div class="text-center py-8">
-        <v-icon icon="mdi-account-group" size="x-large" color="secondary" class="mb-4"></v-icon>
-        <h3 class="text-h5 mb-2">No staff yet</h3>
+    <Card v-else-if="!staffStore.staff.length">
+      <div class="empty-state py-8">
+        <span class="icon empty-state-icon">👥</span>
+        <h3 class="empty-state-title mb-2">No staff yet</h3>
         <p class="mb-4">Add your first staff member to get started</p>
-        <div class="d-flex justify-center gap-2">
-          <AddButton color="primary" @click="addStaff('supervisor')" />
-          <AddButton color="secondary" @click="addStaff('porter')" />
+        <div class="button-group">
+          <Button variant="primary" iconLeft="+" @click="addStaff('supervisor')">
+            Add Supervisor
+          </Button>
+          <Button variant="secondary" iconLeft="+" @click="addStaff('porter')">
+            Add Porter
+          </Button>
         </div>
       </div>
-    </IOSCard>
+    </Card>
     
     <!-- Staff Lists -->
     <div v-else class="staff-lists">
       <!-- Supervisors Section -->
-      <IOSCard class="staff-card">
-        <div class="ios-card-header">
-          <div class="d-flex justify-space-between align-center pa-4">
-            <div class="d-flex align-center">
-              <h2 class="text-h5 font-weight-medium">Supervisors</h2>
-              <v-badge
-                :content="supervisors.length"
-                color="primary"
-                class="ml-3"
-              ></v-badge>
+      <Card class="staff-card">
+        <template #header>
+          <div class="flex-between">
+            <div class="flex-start">
+              <h2 class="card-title">Supervisors</h2>
+              <Badge variant="primary" class="ml-3">
+                {{ supervisors.length }}
+              </Badge>
             </div>
-            <AddButton 
-              color="primary" 
-              size="x-small"
+            <Button 
+              variant="primary" 
+              size="sm"
+              iconLeft="+"
               @click="addStaff('supervisor')"
+              title="Add supervisor"
             />
           </div>
-        </div>
+        </template>
         
         <div class="inset-content">
           <!-- Supervisor Items -->
           <div v-if="supervisors.length">
-            <IOSListItem
+            <ListItem
               v-for="supervisor in supervisors"
               :key="supervisor.id"
               :model-value="supervisor.name"
@@ -60,36 +63,36 @@
           </div>
           
           <!-- Empty Supervisors State -->
-          <div v-else class="text-center py-4">
-            <p class="text-medium-emphasis mb-2">No supervisors added yet</p>
+          <div v-else class="empty-state py-4">
+            <p class="text-gray-600 mb-2">No supervisors added yet</p>
           </div>
         </div>
-      </IOSCard>
+      </Card>
       
       <!-- Porters Section -->
-      <IOSCard class="staff-card">
-        <div class="ios-card-header">
-          <div class="d-flex justify-space-between align-center pa-4">
-            <div class="d-flex align-center">
-              <h2 class="text-h5 font-weight-medium">Porters</h2>
-              <v-badge
-                :content="porters.length"
-                color="secondary"
-                class="ml-3"
-              ></v-badge>
+      <Card class="staff-card">
+        <template #header>
+          <div class="flex-between">
+            <div class="flex-start">
+              <h2 class="card-title">Porters</h2>
+              <Badge variant="secondary" class="ml-3">
+                {{ porters.length }}
+              </Badge>
             </div>
-            <AddButton 
-              color="secondary" 
-              size="x-small"
+            <Button 
+              variant="secondary" 
+              size="sm"
+              iconLeft="+"
               @click="addStaff('porter')"
+              title="Add porter"
             />
           </div>
-        </div>
+        </template>
         
         <div class="inset-content">
           <!-- Porter Items -->
           <div v-if="porters.length">
-            <IOSListItem
+            <ListItem
               v-for="porter in porters"
               :key="porter.id"
               :model-value="porter.name"
@@ -102,83 +105,59 @@
           </div>
           
           <!-- Empty Porters State -->
-          <div v-else class="text-center py-4">
-            <p class="text-medium-emphasis mb-2">No porters added yet</p>
+          <div v-else class="empty-state py-4">
+            <p class="text-gray-600 mb-2">No porters added yet</p>
           </div>
         </div>
-      </IOSCard>
+      </Card>
     </div>
     
     <!-- Delete Confirmation Dialog -->
-    <v-dialog v-model="deleteDialogVisible" max-width="400" persistent>
-      <v-card class="ios-dialog">
-        <v-card-title class="text-h5">Confirm Deletion</v-card-title>
-        <v-card-text>
-          Are you sure you want to delete this staff member? This action cannot be undone.
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <IOSButton
-            color="secondary"
-            variant="text"
-            @click="deleteDialogVisible = false"
-          >
-            Cancel
-          </IOSButton>
-          <IOSButton
-            color="error"
-            @click="confirmDelete"
-          >
-            Delete
-          </IOSButton>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <DialogConfirm
+      v-model="deleteDialogVisible"
+      title="Confirm Deletion"
+      message="Are you sure you want to delete this staff member? This action cannot be undone."
+      cancelText="Cancel"
+      confirmText="Delete"
+      confirmVariant="error"
+      @confirm="confirmDelete"
+      @cancel="deleteDialogVisible = false"
+    />
     
     <!-- New Staff Dialog -->
-    <v-dialog v-model="staffDialogVisible" max-width="400" persistent>
-      <v-card class="ios-dialog">
-        <v-card-title class="text-h5">
-          Add {{ newStaff.type === 'supervisor' ? 'Supervisor' : 'Porter' }}
-        </v-card-title>
-        <v-card-text>
-          <v-text-field
-            v-model="newStaff.name"
-            :label="newStaff.type === 'supervisor' ? 'Supervisor Name' : 'Porter Name'"
-            variant="outlined"
-            autofocus
-            @keyup.enter="saveNewStaff"
-          ></v-text-field>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <IOSButton
-            color="secondary"
-            variant="text"
-            @click="staffDialogVisible = false"
-          >
-            Cancel
-          </IOSButton>
-          <IOSButton
-            :color="newStaff.type === 'supervisor' ? 'primary' : 'secondary'"
-            :disabled="!newStaff.name"
-            @click="saveNewStaff"
-          >
-            Add
-          </IOSButton>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <DialogConfirm
+      v-model="staffDialogVisible"
+      :title="`Add ${newStaff.type === 'supervisor' ? 'Supervisor' : 'Porter'}`"
+      :showConfirmButton="!!newStaff.name.trim()"
+      confirmText="Add"
+      @confirm="saveNewStaff"
+      @cancel="staffDialogVisible = false"
+    >
+      <div class="form-group">
+        <label for="staff-name" class="form-label">
+          {{ newStaff.type === 'supervisor' ? 'Supervisor Name' : 'Porter Name' }}
+        </label>
+        <input
+          id="staff-name"
+          v-model="newStaff.name"
+          class="form-control"
+          :placeholder="`Enter ${newStaff.type} name`"
+          @keyup.enter="saveNewStaff"
+        />
+      </div>
+    </DialogConfirm>
   </section>
 </template>
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useStaffStore } from '../../stores/staff'
-import IOSCard from '../common/IOSCard.vue'
-import IOSListItem from '../common/IOSListItem.vue'
-import IOSButton from '../common/IOSButton.vue'
-import AddButton from '../common/AddButton.vue'
+import Card from '../common/Card.vue'
+import ListItem from '../common/ListItem.vue'
+import Button from '../common/Button.vue'
+import Badge from '../common/Badge.vue'
+import DialogConfirm from '../common/DialogConfirm.vue'
+import LoadingIndicator from '../common/LoadingIndicator.vue'
 
 // Store
 const staffStore = useStaffStore()
@@ -238,53 +217,67 @@ const confirmDelete = async () => {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .staff-tab {
   max-width: 800px;
   margin: 0 auto;
-  padding: 16px;
-}
-
-.staff-tab__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  padding: $spacing-4;
 }
 
 .staff-lists {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: $spacing-6;
 }
 
 .staff-card {
-  background-color: white;
+  background-color: $color-white;
 }
 
-.ios-dialog {
-  border-radius: 16px;
-  overflow: hidden;
+.inset-content {
+  padding: $spacing-2;
+  background-color: $color-gray-100;
+  border-radius: $border-radius;
 }
 
-@media (prefers-color-scheme: dark) {
-  .ios-dialog {
-    background-color: #2C2C2E;
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  
+  .empty-state-icon {
+    font-size: 2.5rem;
+    margin-bottom: $spacing-4;
+    color: $color-gray-400;
   }
   
-  .staff-card {
-    background-color: #1C1C1E;
+  .empty-state-title {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-medium;
+    margin-bottom: $spacing-2;
   }
 }
 
-@media (max-width: 600px) {
-  .staff-tab__header {
+.button-group {
+  display: flex;
+  gap: $spacing-3;
+  justify-content: center;
+}
+
+.ml-3 {
+  margin-left: $spacing-3;
+}
+
+@include responsive(sm) {
+  .staff-tab {
+    padding: $spacing-3;
+  }
+  
+  .button-group {
     flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
-  }
-  
-  .staff-tab__header > div:first-child {
-    margin-bottom: 8px;
+    gap: $spacing-2;
   }
 }
 </style>

@@ -1,0 +1,160 @@
+/* Card Styles */
+
+.card {
+  @include card;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  
+  // Card sections
+  .card-header {
+    padding: $spacing-4;
+    border-bottom: 1px solid $color-gray-200;
+    
+    &:last-child {
+      border-bottom: none;
+    }
+    
+    .card-title {
+      font-size: $font-size-xl;
+      font-weight: $font-weight-medium;
+      margin: 0;
+    }
+    
+    .card-subtitle {
+      font-size: $font-size-sm;
+      color: $color-gray-600;
+      margin-top: $spacing-1;
+    }
+  }
+  
+  .card-body {
+    padding: $spacing-4;
+    flex: 1 1 auto;
+  }
+  
+  .card-footer {
+    padding: $spacing-4;
+    border-top: 1px solid $color-gray-200;
+    
+    &:first-child {
+      border-top: none;
+    }
+  }
+  
+  // Card variations
+  &.card-compact {
+    .card-header, 
+    .card-body, 
+    .card-footer {
+      padding: $spacing-3;
+    }
+  }
+  
+  &.card-flat {
+    box-shadow: none;
+    border: 1px solid $color-gray-200;
+  }
+  
+  &.card-hover {
+    transition: $transition-base;
+    
+    &:hover {
+      transform: translateY(-4px);
+      box-shadow: $shadow-md;
+    }
+  }
+  
+  // Card with image
+  .card-img {
+    width: 100%;
+    display: block;
+    
+    &-top {
+      border-top-left-radius: $border-radius-lg;
+      border-top-right-radius: $border-radius-lg;
+    }
+    
+    &-bottom {
+      border-bottom-left-radius: $border-radius-lg;
+      border-bottom-right-radius: $border-radius-lg;
+    }
+  }
+  
+  // Card actions
+  .card-actions {
+    display: flex;
+    padding: $spacing-3 $spacing-4;
+    gap: $spacing-2;
+    
+    &.actions-start {
+      justify-content: flex-start;
+    }
+    
+    &.actions-center {
+      justify-content: center;
+    }
+    
+    &.actions-end {
+      justify-content: flex-end;
+    }
+    
+    &.actions-between {
+      justify-content: space-between;
+    }
+  }
+  
+  // Card grid layout for items inside the card
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: $spacing-4;
+    padding: $spacing-4;
+  }
+  
+  // Card with border accent
+  &.card-accent-primary { border-top: 3px solid $color-primary; }
+  &.card-accent-secondary { border-top: 3px solid $color-secondary; }
+  &.card-accent-accent { border-top: 3px solid $color-accent; }
+  &.card-accent-warning { border-top: 3px solid $color-warning; }
+  &.card-accent-error { border-top: 3px solid $color-error; }
+  
+  // Card with status
+  &.card-status {
+    position: relative;
+    overflow: hidden;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      width: 3px;
+      top: 0;
+      bottom: 0;
+      left: 0;
+    }
+    
+    &.status-primary::before { background-color: $color-primary; }
+    &.status-secondary::before { background-color: $color-secondary; }
+    &.status-accent::before { background-color: $color-accent; }
+    &.status-warning::before { background-color: $color-warning; }
+    &.status-error::before { background-color: $color-error; }
+    
+    .card-header, .card-body, .card-footer {
+      padding-left: calc(#{$spacing-4} + 3px);
+    }
+  }
+}
+
+// Card group
+.card-group {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-4;
+}
+
+// Card grid layout for card components
+.cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: $spacing-4;
+}

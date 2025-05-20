@@ -1,72 +1,72 @@
 <template>
   <div class="department-select-form">
-    <v-form @submit.prevent="submitForm">
-      <h3 class="text-h6 mb-3">Assign Porter to Department</h3>
+    <form @submit.prevent="submitForm">
+      <h3 class="form-title mb-4">Assign Porter to Department</h3>
       
       <!-- Porter Info -->
-      <div class="porter-info mb-4 pb-3 border-bottom">
-        <div class="d-flex align-center">
-          <v-avatar size="36" color="primary" class="mr-3">
-            <v-icon icon="mdi-account" color="white"></v-icon>
-          </v-avatar>
+      <div class="porter-info mb-4 border-bottom pb-3">
+        <div class="flex-start">
+          <div class="porter-avatar">
+            <span class="icon">👤</span>
+          </div>
           <div>
-            <div class="text-subtitle-1 font-weight-medium">{{ porter?.name }}</div>
-            <div class="text-caption text-medium-emphasis">{{ porter?.type }}</div>
+            <div class="porter-name">{{ porter?.name }}</div>
+            <div class="porter-type text-gray-600">{{ porter?.type }}</div>
           </div>
         </div>
       </div>
       
-      <!-- Department field removed as requested -->
-      
-  <!-- Designation Selection -->
-  <v-autocomplete
-    v-model="form.designationId"
-    :items="designations"
-    item-title="name"
-    item-value="id"
-    label="Designation (Required)"
-    variant="outlined"
-    density="comfortable"
-    :loading="isLoading"
-    :disabled="designations.length === 0"
-    :error-messages="errors.designation"
-    required
-    class="mb-4"
-    @update:model-value="errors.designation = ''"
-  >
-        <template #prepend>
-          <v-tooltip location="bottom" v-if="designations.length === 0">
-            <template #activator="{ props }">
-              <v-icon
-                icon="mdi-information-outline"
-                color="info"
-                size="small"
-                v-bind="props"
-              ></v-icon>
-            </template>
-            <span>No designations available. You can add them in Settings.</span>
-          </v-tooltip>
-        </template>
-      </v-autocomplete>
-    </v-form>
+      <!-- Designation Selection -->
+      <div class="form-group mb-4">
+        <label for="designation" class="form-label">Designation (Required)</label>
+        <div class="select-wrapper">
+          <select
+            id="designation"
+            v-model="form.designationId"
+            class="form-control"
+            :class="{ 'is-invalid': errors.designation }"
+            :disabled="designations.length === 0 || isLoading"
+            required
+            @change="errors.designation = ''"
+          >
+            <option value="">Select Designation</option>
+            <option 
+              v-for="designation in designations" 
+              :key="designation.id" 
+              :value="designation.id"
+            >
+              {{ designation.name }}
+            </option>
+          </select>
+          
+          <div v-if="designations.length === 0" class="input-info-icon" title="No designations available. You can add them in Settings.">
+            <span class="icon">ℹ️</span>
+          </div>
+        </div>
+        
+        <div v-if="errors.designation" class="invalid-feedback">
+          {{ errors.designation }}
+        </div>
+      </div>
+    </form>
     
     <!-- Action Buttons -->
-    <div class="d-flex justify-end">
-      <IOSButton
+    <div class="form-actions flex-end">
+      <Button
         variant="text"
-        color="secondary"
         class="mr-2"
         @click="$emit('cancel')"
       >
         Cancel
-      </IOSButton>
-    <IOSButton
-      color="primary"
-      :disabled="!form.designationId || isLoading"
-      @click="submitForm"
-    >
-      Assign
-    </IOSButton>
+      </Button>
+      
+      <Button
+        variant="primary"
+        :disabled="!form.designationId || isLoading"
+        @click="submitForm"
+      >
+        Assign
+      </Button>
     </div>
   </div>
 </template>
@@ -74,7 +74,7 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
-import IOSButton from '../common/IOSButton.vue'
+import Button from '../common/Button.vue'
 
 const route = useRoute()
 
@@ -117,15 +117,13 @@ const submitForm = () => {
   
   emit('submit', {
     porterId: props.porter.id,
-    shiftId: props.shiftId,  // Use the prop directly
+    shiftId: props.shiftId,
     ...form.value
   })
 }
 
 const validateForm = () => {
   let isValid = true
-  
-  // Department validation removed as the field is no longer present
   
   if (!form.value.designationId) {
     errors.value.designation = 'Designation is required'
@@ -136,18 +134,62 @@ const validateForm = () => {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .department-select-form {
-  padding: 16px;
+  padding: $spacing-4;
+}
+
+.form-title {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
 }
 
 .border-bottom {
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  border-bottom: 1px solid $color-gray-200;
 }
 
-@media (prefers-color-scheme: dark) {
-  .border-bottom {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+.porter-info {
+  display: flex;
+  align-items: center;
+}
+
+.porter-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background-color: $color-primary;
+  color: $color-white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: $spacing-3;
+}
+
+.porter-name {
+  font-weight: $font-weight-medium;
+  font-size: $font-size-sm;
+}
+
+.porter-type {
+  font-size: $font-size-xs;
+}
+
+.select-wrapper {
+  position: relative;
+  
+  .input-info-icon {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 0.5rem;
+    color: $color-info;
+    font-size: $font-size-sm;
   }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: $spacing-4;
 }
 </style>

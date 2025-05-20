@@ -1,39 +1,44 @@
 <template>
   <section class="buildings-tab">
     <!-- Actions -->
-    <div class="d-flex justify-end mb-4">
-      <AddButton 
-        color="primary" 
+    <div class="flex-end mb-4">
+      <Button 
+        variant="primary" 
+        iconLeft="+"
         @click="addBuilding"
-      />
+        title="Add new building"
+      >
+        Add Building
+      </Button>
     </div>
     
     <!-- Loading Indicator -->
     <div v-if="buildingsStore.isLoading" class="text-center py-6">
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
-      <p class="mt-2 text-medium-emphasis">Loading buildings...</p>
+      <LoadingIndicator label="Loading buildings..." />
     </div>
     
     <!-- Empty State -->
-    <IOSCard v-else-if="!buildingsStore.buildings.length">
-      <div class="text-center py-8">
-        <v-icon icon="mdi-office-building-outline" size="x-large" color="secondary" class="mb-4"></v-icon>
-        <h3 class="text-h5 mb-2">No buildings yet</h3>
+    <Card v-else-if="!buildingsStore.buildings.length">
+      <div class="empty-state py-8">
+        <span class="icon empty-state-icon">🏢</span>
+        <h3 class="empty-state-title mb-2">No buildings yet</h3>
         <p class="mb-4">Add your first building to get started</p>
-        <AddButton color="primary" @click="addBuilding" />
+        <Button variant="primary" iconLeft="+" @click="addBuilding">
+          Add Building
+        </Button>
       </div>
-    </IOSCard>
+    </Card>
     
     <!-- Buildings List -->
     <div v-else class="buildings-list">
-      <IOSCard 
+      <Card 
         v-for="building in buildingsStore.buildings" 
         :key="building.id"
         class="building-card"
       >
         <!-- Building Header -->
-        <div class="ios-card-header">
-          <IOSListItem
+        <template #header>
+          <ListItem
             :model-value="building.name"
             :editable="true"
             :deletable="true"
@@ -41,13 +46,13 @@
             @update:model-value="updateBuildingName(building.id, $event)"
             @delete="confirmDeleteBuilding(building)"
           />
-        </div>
+        </template>
         
         <!-- Departments List -->
         <div class="inset-content">
           <!-- Department Items -->
           <div v-if="building.departments && building.departments.length">
-            <IOSListItem
+            <ListItem
               v-for="dept in building.departments"
               :key="dept.id"
               :model-value="dept.name"
@@ -60,123 +65,89 @@
           </div>
           
           <!-- Empty Department State -->
-          <div v-else class="text-center py-4">
-            <p class="text-medium-emphasis mb-2">No departments in this building</p>
+          <div v-else class="empty-state py-4">
+            <p class="text-gray-600 mb-2">No departments in this building</p>
           </div>
           
           <!-- Add Department Button -->
           <div class="px-4 pb-3 pt-2 d-flex justify-center">
-            <AddButton
-              color="primary"
-              size="x-small"
+            <Button
+              variant="secondary"
+              size="sm"
+              iconLeft="+"
               @click="addDepartment(building)"
-            />
+            >
+              Add Department
+            </Button>
           </div>
         </div>
-      </IOSCard>
+      </Card>
     </div>
     
     <!-- Delete Confirmation Dialog -->
-    <v-dialog v-model="deleteDialogVisible" max-width="400" persistent>
-      <v-card class="ios-dialog">
-        <v-card-title class="text-h5">Confirm Deletion</v-card-title>
-        <v-card-text>
-          Are you sure you want to delete this {{ deleteType }}? This action cannot be undone.
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <IOSButton
-            color="secondary"
-            variant="text"
-            @click="deleteDialogVisible = false"
-          >
-            Cancel
-          </IOSButton>
-          <IOSButton
-            color="error"
-            @click="confirmDelete"
-          >
-            Delete
-          </IOSButton>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <DialogConfirm
+      v-model="deleteDialogVisible"
+      title="Confirm Deletion"
+      :message="`Are you sure you want to delete this ${deleteType}? This action cannot be undone.`"
+      cancelText="Cancel"
+      confirmText="Delete"
+      confirmVariant="error"
+      @confirm="confirmDelete"
+      @cancel="deleteDialogVisible = false"
+    />
     
     <!-- New Building Dialog -->
-    <v-dialog v-model="buildingDialogVisible" max-width="400" persistent>
-      <v-card class="ios-dialog">
-        <v-card-title class="text-h5">Add Building</v-card-title>
-        <v-card-text>
-          <v-text-field
-            v-model="newBuilding.name"
-            label="Building Name"
-            variant="outlined"
-            autofocus
-            @keyup.enter="saveNewBuilding"
-          ></v-text-field>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <IOSButton
-            color="secondary"
-            variant="text"
-            @click="buildingDialogVisible = false"
-          >
-            Cancel
-          </IOSButton>
-          <IOSButton
-            color="primary"
-            :disabled="!newBuilding.name"
-            @click="saveNewBuilding"
-          >
-            Add
-          </IOSButton>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <DialogConfirm
+      v-model="buildingDialogVisible"
+      title="Add Building"
+      :showConfirmButton="!!newBuilding.name.trim()"
+      confirmText="Add"
+      @confirm="saveNewBuilding"
+      @cancel="buildingDialogVisible = false"
+    >
+      <div class="form-group">
+        <label for="building-name" class="form-label">Building Name</label>
+        <input
+          id="building-name"
+          v-model="newBuilding.name"
+          class="form-control"
+          placeholder="Enter building name"
+          @keyup.enter="saveNewBuilding"
+        />
+      </div>
+    </DialogConfirm>
     
     <!-- New Department Dialog -->
-    <v-dialog v-model="departmentDialogVisible" max-width="400" persistent>
-      <v-card class="ios-dialog">
-        <v-card-title class="text-h5">Add Department</v-card-title>
-        <v-card-text>
-          <v-text-field
-            v-model="newDepartment.name"
-            label="Department Name"
-            variant="outlined"
-            autofocus
-            @keyup.enter="saveNewDepartment"
-          ></v-text-field>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <IOSButton
-            color="secondary"
-            variant="text"
-            @click="departmentDialogVisible = false"
-          >
-            Cancel
-          </IOSButton>
-          <IOSButton
-            color="primary"
-            :disabled="!newDepartment.name"
-            @click="saveNewDepartment"
-          >
-            Add
-          </IOSButton>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <DialogConfirm
+      v-model="departmentDialogVisible"
+      title="Add Department"
+      :showConfirmButton="!!newDepartment.name.trim()"
+      confirmText="Add"
+      @confirm="saveNewDepartment"
+      @cancel="departmentDialogVisible = false"
+    >
+      <div class="form-group">
+        <label for="department-name" class="form-label">Department Name</label>
+        <input
+          id="department-name"
+          v-model="newDepartment.name"
+          class="form-control"
+          placeholder="Enter department name"
+          @keyup.enter="saveNewDepartment"
+        />
+      </div>
+    </DialogConfirm>
   </section>
 </template>
 
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useBuildingsStore } from '../../stores/buildings'
-import IOSCard from '../common/IOSCard.vue'
-import IOSListItem from '../common/IOSListItem.vue'
-import IOSButton from '../common/IOSButton.vue'
-import AddButton from '../common/AddButton.vue'
+import Card from '../common/Card.vue'
+import ListItem from '../common/ListItem.vue'
+import Button from '../common/Button.vue'
+import DialogConfirm from '../common/DialogConfirm.vue'
+import LoadingIndicator from '../common/LoadingIndicator.vue'
 
 // Store
 const buildingsStore = useBuildingsStore()
@@ -277,45 +248,53 @@ const confirmDelete = async () => {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .buildings-tab {
   max-width: 800px;
   margin: 0 auto;
-  padding: 16px;
-}
-
-.buildings-tab__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  padding: $spacing-4;
 }
 
 .buildings-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: $spacing-4;
 }
 
-.ios-dialog {
-  border-radius: 16px;
-  overflow: hidden;
+.inset-content {
+  padding: $spacing-2;
+  background-color: $color-gray-100;
+  border-radius: $border-radius;
 }
 
-@media (prefers-color-scheme: dark) {
-  .ios-dialog {
-    background-color: #2C2C2E;
-  }
-}
-
-@media (max-width: 600px) {
-  .buildings-tab__header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  
+  .empty-state-icon {
+    font-size: 2.5rem;
+    margin-bottom: $spacing-4;
+    color: $color-gray-400;
   }
   
-  .buildings-tab__header > div:first-child {
-    margin-bottom: 8px;
+  .empty-state-title {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-medium;
+    margin-bottom: $spacing-2;
+  }
+}
+
+.justify-center {
+  display: flex;
+  justify-content: center;
+}
+
+@include responsive(sm) {
+  .buildings-tab {
+    padding: $spacing-3;
   }
 }
 </style>

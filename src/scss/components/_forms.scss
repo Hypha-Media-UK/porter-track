@@ -1,0 +1,292 @@
+/* Form Styles */
+
+// Form group
+.form-group {
+  margin-bottom: $spacing-4;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// Form label
+.form-label {
+  display: block;
+  margin-bottom: $spacing-2;
+  font-weight: $font-weight-medium;
+  font-size: $font-size-sm;
+  color: $color-gray-700;
+}
+
+// Form control (inputs, selects, textareas)
+.form-control {
+  display: block;
+  width: 100%;
+  padding: $spacing-2 $spacing-3;
+  font-size: $font-size-md;
+  line-height: 1.5;
+  color: $color-gray-900;
+  background-color: $color-white;
+  background-clip: padding-box;
+  border: 1px solid $color-gray-300;
+  border-radius: $border-radius-md;
+  transition: $transition-base;
+  
+  &:focus {
+    border-color: lighten($color-primary, 25%);
+    outline: 0;
+    box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+  }
+  
+  &::placeholder {
+    color: $color-gray-500;
+    opacity: 1;
+  }
+  
+  &:disabled,
+  &[readonly] {
+    background-color: $color-gray-100;
+    opacity: 1;
+  }
+  
+  // Error state
+  &.is-invalid {
+    border-color: $color-error;
+    
+    &:focus {
+      border-color: $color-error;
+      box-shadow: 0 0 0 3px rgba($color-error, 0.1);
+    }
+  }
+  
+  // Success state
+  &.is-valid {
+    border-color: $color-accent;
+    
+    &:focus {
+      border-color: $color-accent;
+      box-shadow: 0 0 0 3px rgba($color-accent, 0.1);
+    }
+  }
+}
+
+// Select
+select.form-control {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right $spacing-3 center;
+  background-size: 16px 12px;
+  padding-right: $spacing-8;
+  
+  &::-ms-expand {
+    display: none;
+  }
+  
+  &[multiple] {
+    background-image: none;
+    padding-right: $spacing-3;
+  }
+}
+
+// Textarea
+textarea.form-control {
+  min-height: 100px;
+  resize: vertical;
+}
+
+// Custom checkboxes and radios
+.form-check {
+  position: relative;
+  display: block;
+  padding-left: 1.75rem;
+  margin-bottom: $spacing-2;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.form-check-input {
+  position: absolute;
+  margin-top: 0.25rem;
+  margin-left: -1.75rem;
+  
+  &[type="checkbox"] {
+    border-radius: 0.25rem;
+  }
+  
+  &[type="radio"] {
+    border-radius: 50%;
+  }
+  
+  &:checked {
+    background-color: $color-primary;
+    border-color: $color-primary;
+  }
+  
+  &:focus {
+    box-shadow: 0 0 0 3px rgba($color-primary, 0.1);
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
+}
+
+.form-check-label {
+  margin-bottom: 0;
+  font-size: $font-size-sm;
+}
+
+// Inline form checks
+.form-check-inline {
+  display: inline-flex;
+  align-items: center;
+  margin-right: $spacing-4;
+  
+  .form-check-input {
+    position: static;
+    margin-top: 0;
+    margin-right: $spacing-2;
+    margin-left: 0;
+  }
+}
+
+// Form text (helper text)
+.form-text {
+  display: block;
+  margin-top: $spacing-1;
+  font-size: $font-size-xs;
+  color: $color-gray-600;
+}
+
+// Feedback states
+.invalid-feedback {
+  display: block;
+  width: 100%;
+  margin-top: $spacing-1;
+  font-size: $font-size-xs;
+  color: $color-error;
+}
+
+.valid-feedback {
+  display: block;
+  width: 100%;
+  margin-top: $spacing-1;
+  font-size: $font-size-xs;
+  color: $color-accent;
+}
+
+// Input groups
+.input-group {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  width: 100%;
+  
+  > .form-control {
+    position: relative;
+    flex: 1 1 auto;
+    width: 1%;
+    min-width: 0;
+    
+    &:not(:first-child) {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+    
+    &:not(:last-child) {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+    }
+  }
+}
+
+.input-group-text {
+  display: flex;
+  align-items: center;
+  padding: $spacing-2 $spacing-3;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-normal;
+  line-height: 1.5;
+  color: $color-gray-700;
+  text-align: center;
+  white-space: nowrap;
+  background-color: $color-gray-100;
+  border: 1px solid $color-gray-300;
+  
+  &:first-child {
+    border-top-left-radius: $border-radius-md;
+    border-bottom-left-radius: $border-radius-md;
+  }
+  
+  &:last-child {
+    border-top-right-radius: $border-radius-md;
+    border-bottom-right-radius: $border-radius-md;
+  }
+}
+
+// Form sizes
+.form-control-sm {
+  min-height: calc(1.5em + #{$spacing-1} * 2 + 2px);
+  padding: $spacing-1 $spacing-2;
+  font-size: $font-size-sm;
+  border-radius: $border-radius-sm;
+}
+
+.form-control-lg {
+  min-height: calc(1.5em + #{$spacing-3} * 2 + 2px);
+  padding: $spacing-3 $spacing-4;
+  font-size: $font-size-lg;
+  border-radius: $border-radius-lg;
+}
+
+// Form layout
+.form-row {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: $spacing-4;
+}
+
+.form-col {
+  grid-column: span 12;
+  
+  @include responsive(sm) {
+    &.col-sm-6 {
+      grid-column: span 6;
+    }
+    
+    &.col-sm-4 {
+      grid-column: span 4;
+    }
+    
+    &.col-sm-3 {
+      grid-column: span 3;
+    }
+  }
+  
+  @include responsive(md) {
+    &.col-md-6 {
+      grid-column: span 6;
+    }
+    
+    &.col-md-4 {
+      grid-column: span 4;
+    }
+    
+    &.col-md-3 {
+      grid-column: span 3;
+    }
+  }
+}
+
+// Form actions
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: $spacing-3;
+  margin-top: $spacing-6;
+}

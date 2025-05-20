@@ -1,57 +1,61 @@
 <template>
   <section class="tasks-tab">
     <!-- Actions -->
-    <div class="d-flex justify-end mb-4">
-      <AddButton 
-        color="primary" 
+    <div class="flex-end mb-4">
+      <Button 
+        variant="primary" 
+        iconLeft="+"
         @click="addTask"
-      />
+        title="Add new task"
+      >
+        Add Task
+      </Button>
     </div>
     
     <!-- Loading Indicator -->
     <div v-if="tasksStore.isLoading" class="text-center py-6">
-      <v-progress-circular indeterminate color="primary"></v-progress-circular>
-      <p class="mt-2 text-medium-emphasis">Loading tasks...</p>
+      <LoadingIndicator label="Loading tasks..." />
     </div>
     
     <!-- Empty State -->
-    <IOSCard v-else-if="!tasksStore.tasks.length">
-      <div class="text-center py-8">
-        <v-icon icon="mdi-clipboard-text-outline" size="x-large" color="secondary" class="mb-4"></v-icon>
-        <h3 class="text-h5 mb-2">No tasks yet</h3>
+    <Card v-else-if="!tasksStore.tasks.length">
+      <div class="empty-state py-8">
+        <span class="icon empty-state-icon">📋</span>
+        <h3 class="empty-state-title mb-2">No tasks yet</h3>
         <p class="mb-4">Add your first task to get started</p>
-        <AddButton color="primary" @click="addTask" />
+        <Button variant="primary" iconLeft="+" @click="addTask">
+          Add Task
+        </Button>
       </div>
-    </IOSCard>
+    </Card>
     
     <!-- Tasks List -->
     <div v-else class="tasks-list">
-      <IOSCard 
+      <Card 
         v-for="task in tasksStore.tasks" 
         :key="task.id"
         class="task-card"
       >
         <!-- Task Header -->
-        <div class="ios-card-header">
-          <IOSListItem
+        <template #header>
+          <ListItem
             :model-value="task.name"
             :editable="true"
             :deletable="true"
             :department-assignable="true"
             :has-department="task.departments?.length > 0"
-            department-color="primary"
             placeholder="Task name"
             @update:model-value="updateTaskName(task.id, $event)"
             @delete="confirmDeleteTask(task)"
             @assign-department="openDepartmentAssignmentDialog(task)"
           />
-        </div>
+        </template>
         
         <!-- Task Items List -->
         <div class="inset-content">
           <!-- Task Item Items -->
           <div v-if="task.taskItems && task.taskItems.length">
-            <IOSListItem
+            <ListItem
               v-for="item in task.taskItems"
               :key="item.id"
               :model-value="item.name"
@@ -59,7 +63,6 @@
               :deletable="true"
               :department-assignable="true"
               :has-department="item.departments?.length > 0"
-              department-color="secondary"
               placeholder="Task item name"
               @update:model-value="updateTaskItemName(item.id, $event)"
               @delete="confirmDeleteTaskItem(item)"
@@ -68,180 +71,145 @@
           </div>
           
           <!-- Empty Task Items State -->
-          <div v-else class="text-center py-4">
-            <p class="text-medium-emphasis mb-2">No task items</p>
+          <div v-else class="empty-state py-4">
+            <p class="text-gray-600 mb-2">No task items</p>
           </div>
           
           <!-- Add Task Item Button -->
           <div class="px-4 pb-3 pt-2 d-flex justify-center">
-            <AddButton
-              color="secondary"
-              size="x-small"
+            <Button
+              variant="secondary"
+              size="sm"
+              iconLeft="+"
               @click="addTaskItem(task)"
-            />
+            >
+              Add Item
+            </Button>
           </div>
         </div>
-      </IOSCard>
+      </Card>
     </div>
     
     <!-- Delete Confirmation Dialog -->
-    <v-dialog v-model="deleteDialogVisible" max-width="400" persistent>
-      <v-card class="ios-dialog">
-        <v-card-title class="text-h5">Confirm Deletion</v-card-title>
-        <v-card-text>
-          Are you sure you want to delete this {{ deleteType }}? This action cannot be undone.
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <IOSButton
-            color="secondary"
-            variant="text"
-            @click="deleteDialogVisible = false"
-          >
-            Cancel
-          </IOSButton>
-          <IOSButton
-            color="error"
-            @click="confirmDelete"
-          >
-            Delete
-          </IOSButton>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <DialogConfirm
+      v-model="deleteDialogVisible"
+      title="Confirm Deletion"
+      :message="`Are you sure you want to delete this ${deleteType}? This action cannot be undone.`"
+      cancelText="Cancel"
+      confirmText="Delete"
+      confirmVariant="error"
+      @confirm="confirmDelete"
+      @cancel="deleteDialogVisible = false"
+    />
     
     <!-- New Task Dialog -->
-    <v-dialog v-model="taskDialogVisible" max-width="400" persistent>
-      <v-card class="ios-dialog">
-        <v-card-title class="text-h5">Add Task</v-card-title>
-        <v-card-text>
-          <v-text-field
-            v-model="newTask.name"
-            label="Task Name"
-            variant="outlined"
-            autofocus
-            @keyup.enter="saveNewTask"
-          ></v-text-field>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <IOSButton
-            color="secondary"
-            variant="text"
-            @click="taskDialogVisible = false"
-          >
-            Cancel
-          </IOSButton>
-          <IOSButton
-            color="primary"
-            :disabled="!newTask.name"
-            @click="saveNewTask"
-          >
-            Add
-          </IOSButton>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <DialogConfirm
+      v-model="taskDialogVisible"
+      title="Add Task"
+      :showConfirmButton="!!newTask.name.trim()"
+      confirmText="Add"
+      @confirm="saveNewTask"
+      @cancel="taskDialogVisible = false"
+    >
+      <div class="form-group">
+        <label for="task-name" class="form-label">Task Name</label>
+        <input
+          id="task-name"
+          v-model="newTask.name"
+          class="form-control"
+          placeholder="Enter task name"
+          @keyup.enter="saveNewTask"
+        />
+      </div>
+    </DialogConfirm>
     
     <!-- New Task Item Dialog -->
-    <v-dialog v-model="taskItemDialogVisible" max-width="400" persistent>
-      <v-card class="ios-dialog">
-        <v-card-title class="text-h5">Add Task Item</v-card-title>
-        <v-card-text>
-          <v-text-field
-            v-model="newTaskItem.name"
-            label="Task Item Name"
-            variant="outlined"
-            autofocus
-            @keyup.enter="saveNewTaskItem"
-          ></v-text-field>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <IOSButton
-            color="secondary"
-            variant="text"
-            @click="taskItemDialogVisible = false"
-          >
-            Cancel
-          </IOSButton>
-          <IOSButton
-            color="primary"
-            :disabled="!newTaskItem.name"
-            @click="saveNewTaskItem"
-          >
-            Add
-          </IOSButton>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+    <DialogConfirm
+      v-model="taskItemDialogVisible"
+      title="Add Task Item"
+      :showConfirmButton="!!newTaskItem.name.trim()"
+      confirmText="Add"
+      @confirm="saveNewTaskItem"
+      @cancel="taskItemDialogVisible = false"
+    >
+      <div class="form-group">
+        <label for="task-item-name" class="form-label">Task Item Name</label>
+        <input
+          id="task-item-name"
+          v-model="newTaskItem.name"
+          class="form-control"
+          placeholder="Enter task item name"
+          @keyup.enter="saveNewTaskItem"
+        />
+      </div>
+    </DialogConfirm>
     
-    <!-- Task Department Assignment Dialog -->
-    <v-dialog v-model="departmentAssignDialogVisible" max-width="500" persistent>
-      <v-card class="ios-dialog">
-        <v-card-title class="text-h5">Assign to Department</v-card-title>
-        <v-card-text>
-          <div v-if="!buildingsStore.buildings.length" class="text-center py-4">
-            <p>No departments available. Please add buildings and departments first.</p>
-          </div>
-          <div v-else>
-            <p class="mb-4">Select a department to assign to this task:</p>
+    <!-- Department Assignment Dialog -->
+    <DialogConfirm
+      v-model="departmentAssignDialogVisible"
+      title="Assign to Department"
+      confirmText="Save"
+      @confirm="saveDepartmentAssignments"
+      @cancel="departmentAssignDialogVisible = false"
+    >
+      <div v-if="!buildingsStore.buildings.length" class="empty-state py-4">
+        <p class="text-gray-600">No departments available. Please add buildings and departments first.</p>
+      </div>
+      <div v-else>
+        <p class="mb-4">Select a department to assign to this task:</p>
+        
+        <div class="departments-accordion">
+          <div 
+            v-for="building in buildingsStore.buildings" 
+            :key="building.id"
+            class="accordion-item"
+          >
+            <div 
+              class="accordion-header" 
+              @click="toggleAccordion(building.id)"
+            >
+              <span>{{ building.name }}</span>
+              <span class="icon">{{ expandedBuildings.includes(building.id) ? '▼' : '▶' }}</span>
+            </div>
             
-            <v-expansion-panels variant="accordion">
-              <v-expansion-panel
-                v-for="building in buildingsStore.buildings"
-                :key="building.id"
-                rounded
+            <div 
+              v-if="expandedBuildings.includes(building.id)"
+              class="accordion-content"
+            >
+              <div 
+                v-for="dept in building.departments" 
+                :key="dept.id"
+                class="radio-item"
               >
-                <v-expansion-panel-title>{{ building.name }}</v-expansion-panel-title>
-                <v-expansion-panel-text>
-                  <v-radio-group v-model="selectedDepartment">
-                    <v-radio
-                      v-for="dept in building.departments"
-                      :key="dept.id"
-                      :value="dept.id"
-                      :label="dept.name"
-                      color="primary"
-                      hide-details
-                      class="mb-2"
-                    ></v-radio>
-                  </v-radio-group>
-                </v-expansion-panel-text>
-              </v-expansion-panel>
-            </v-expansion-panels>
+                <label :for="`dept-${dept.id}`" class="radio-label">
+                  <input 
+                    type="radio" 
+                    :id="`dept-${dept.id}`" 
+                    :value="dept.id" 
+                    v-model="selectedDepartment"
+                    name="department"
+                    class="radio-input"
+                  />
+                  <span class="radio-text">{{ dept.name }}</span>
+                </label>
+              </div>
+            </div>
           </div>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <IOSButton
-            color="secondary"
-            variant="text"
-            @click="departmentAssignDialogVisible = false"
-          >
-            Cancel
-          </IOSButton>
-          <IOSButton
-            color="primary"
-            @click="saveDepartmentAssignments"
-          >
-            Save
-          </IOSButton>
-        </v-card-actions>
-      </v-card>
-    </v-dialog>
+        </div>
+      </div>
+    </DialogConfirm>
     
     <!-- Task Item Department Assignment Dialog -->
-    <v-dialog v-model="taskItemDepartmentDialogVisible" max-width="500" persistent>
-      <TaskItemDepartmentAssociation
-        v-if="taskItemDepartmentDialogVisible"
-        :task-item-id="currentTaskItem?.id"
-        :task-item-name="currentTaskItem?.name"
-        :buildings="buildingsStore.buildings"
-        :selected-departments="currentTaskItem?.departments || []"
-        @save="saveTaskItemDepartments"
-        @cancel="taskItemDepartmentDialogVisible = false"
-      />
-    </v-dialog>
+    <TaskItemDepartmentAssociation
+      v-if="taskItemDepartmentDialogVisible"
+      v-model="taskItemDepartmentDialogVisible"
+      :task-item-id="currentTaskItem?.id"
+      :task-item-name="currentTaskItem?.name"
+      :buildings="buildingsStore.buildings"
+      :selected-departments="currentTaskItem?.departments || []"
+      @save="saveTaskItemDepartments"
+      @cancel="taskItemDepartmentDialogVisible = false"
+    />
   </section>
 </template>
 
@@ -249,10 +217,11 @@
 import { ref, onMounted } from 'vue'
 import { useTasksStore } from '../../stores/tasks'
 import { useBuildingsStore } from '../../stores/buildings'
-import IOSCard from '../common/IOSCard.vue'
-import IOSListItem from '../common/IOSListItem.vue'
-import IOSButton from '../common/IOSButton.vue'
-import AddButton from '../common/AddButton.vue'
+import Card from '../common/Card.vue'
+import ListItem from '../common/ListItem.vue'
+import Button from '../common/Button.vue'
+import DialogConfirm from '../common/DialogConfirm.vue'
+import LoadingIndicator from '../common/LoadingIndicator.vue'
 import TaskItemDepartmentAssociation from '../task-items/TaskItemDepartmentAssociation.vue'
 
 // Stores
@@ -272,7 +241,7 @@ const newTaskItem = ref({ name: '', task_id: null })
 const currentTask = ref(null)
 const currentTaskItem = ref(null)
 const selectedDepartment = ref(null)
-const selectedDepartments = ref([]) // Keep this for backward compatibility
+const expandedBuildings = ref([])
 
 // Fetch data
 onMounted(async () => {
@@ -281,6 +250,16 @@ onMounted(async () => {
     buildingsStore.fetchBuildings()
   ])
 })
+
+// Accordion toggle
+const toggleAccordion = (buildingId) => {
+  const index = expandedBuildings.value.indexOf(buildingId)
+  if (index === -1) {
+    expandedBuildings.value.push(buildingId)
+  } else {
+    expandedBuildings.value.splice(index, 1)
+  }
+}
 
 // Task operations
 const addTask = () => {
@@ -356,6 +335,10 @@ const openDepartmentAssignmentDialog = (task) => {
   selectedDepartment.value = task.departments && task.departments.length > 0 
     ? task.departments[0].id 
     : null
+  
+  // Expand all buildings on dialog open
+  expandedBuildings.value = buildingsStore.buildings.map(b => b.id)
+  
   departmentAssignDialogVisible.value = true
 }
 
@@ -401,53 +384,119 @@ const confirmDelete = async () => {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .tasks-tab {
   max-width: 800px;
   margin: 0 auto;
-  padding: 16px;
-}
-
-.tasks-tab__header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+  padding: $spacing-4;
 }
 
 .tasks-list {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: $spacing-4;
 }
 
-.task-departments {
-  border-top: 1px solid rgba(0, 0, 0, 0.08);
+.task-card {
+  background-color: $color-white;
 }
 
-.ios-dialog {
-  border-radius: 16px;
+.inset-content {
+  padding: $spacing-2;
+  background-color: $color-gray-100;
+  border-radius: $border-radius;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  
+  .empty-state-icon {
+    font-size: 2.5rem;
+    margin-bottom: $spacing-4;
+    color: $color-gray-400;
+  }
+  
+  .empty-state-title {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-medium;
+    margin-bottom: $spacing-2;
+  }
+}
+
+.justify-center {
+  display: flex;
+  justify-content: center;
+}
+
+// Departments accordion styles
+.departments-accordion {
+  border: 1px solid $color-gray-200;
+  border-radius: $border-radius;
   overflow: hidden;
 }
 
-@media (prefers-color-scheme: dark) {
-  .ios-dialog {
-    background-color: #2C2C2E;
-  }
+.accordion-item {
+  border-bottom: 1px solid $color-gray-200;
   
-  .task-departments {
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  &:last-child {
+    border-bottom: none;
   }
 }
 
-@media (max-width: 600px) {
-  .tasks-tab__header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 16px;
+.accordion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: $spacing-3 $spacing-4;
+  background-color: $color-white;
+  cursor: pointer;
+  transition: $transition-base;
+  font-weight: $font-weight-medium;
+  
+  &:hover {
+    background-color: $color-gray-100;
   }
   
-  .tasks-tab__header > div:first-child {
-    margin-bottom: 8px;
+  .icon {
+    font-size: $font-size-sm;
+    color: $color-gray-600;
+  }
+}
+
+.accordion-content {
+  padding: $spacing-2 $spacing-4;
+  background-color: $color-gray-50;
+}
+
+.radio-item {
+  margin-bottom: $spacing-2;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.radio-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.radio-input {
+  margin-right: $spacing-2;
+}
+
+.radio-text {
+  font-size: $font-size-sm;
+}
+
+@include responsive(sm) {
+  .tasks-tab {
+    padding: $spacing-3;
   }
 }
 </style>

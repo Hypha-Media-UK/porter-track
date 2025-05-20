@@ -1,0 +1,39 @@
+/* Main SCSS Entry File */
+
+// Base styles
+@import 'reset';
+
+// Import grid system
+@import 'grid';
+
+// Import utility classes
+@import 'utilities';
+
+// Import component styles
+@import 'components/buttons';
+@import 'components/cards';
+@import 'components/forms';
+@import 'components/badges';
+@import 'components/misc';
+
+// Import layout styles
+@import 'layouts/app';
+
+/* Custom icons */
+.icon {
+  display: inline-block;
+  width: 1em;
+  height: 1em;
+  stroke-width: 0;
+  stroke: currentColor;
+  fill: currentColor;
+  line-height: 0;
+  vertical-align: middle;
+}
+
+/* Framework cleanup */
+// This section removes any remaining Vuetify-specific styles
+// that might be affecting the layout after the redesign
+[class*="v-"], .v-application {
+  all: unset !important;
+}

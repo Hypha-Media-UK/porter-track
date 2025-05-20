@@ -1,0 +1,331 @@
+/* Miscellaneous Components */
+
+/* Loading Indicators */
+.loading-spinner {
+  display: inline-block;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid $color-gray-200;
+  border-radius: 50%;
+  border-top-color: $color-primary;
+  animation: spin 0.75s linear infinite;
+  
+  &.spinner-sm {
+    width: 1rem;
+    height: 1rem;
+    border-width: 1px;
+  }
+  
+  &.spinner-lg {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-width: 3px;
+  }
+  
+  &.spinner-primary { border-top-color: $color-primary; }
+  &.spinner-secondary { border-top-color: $color-secondary; }
+  &.spinner-accent { border-top-color: $color-accent; }
+  &.spinner-warning { border-top-color: $color-warning; }
+  &.spinner-error { border-top-color: $color-error; }
+}
+
+.loading-dots {
+  display: inline-flex;
+  align-items: center;
+  
+  .dot {
+    display: inline-block;
+    width: 0.5rem;
+    height: 0.5rem;
+    margin: 0 0.15rem;
+    border-radius: 50%;
+    background-color: $color-primary;
+    animation: pulse-dot 1.5s infinite;
+    
+    &:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    
+    &:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+  }
+  
+  &.dots-sm .dot {
+    width: 0.3rem;
+    height: 0.3rem;
+  }
+  
+  &.dots-lg .dot {
+    width: 0.7rem;
+    height: 0.7rem;
+  }
+  
+  &.dots-primary .dot { background-color: $color-primary; }
+  &.dots-secondary .dot { background-color: $color-secondary; }
+  &.dots-accent .dot { background-color: $color-accent; }
+  &.dots-warning .dot { background-color: $color-warning; }
+  &.dots-error .dot { background-color: $color-error; }
+}
+
+/* Alerts */
+.alert {
+  position: relative;
+  padding: $spacing-3 $spacing-4;
+  margin-bottom: $spacing-4;
+  border: 1px solid transparent;
+  border-radius: $border-radius-lg;
+  
+  // Alert variants
+  &.alert-primary {
+    background-color: rgba($color-primary, 0.1);
+    border-color: rgba($color-primary, 0.2);
+    color: darken($color-primary, 15%);
+  }
+  
+  &.alert-secondary {
+    background-color: rgba($color-secondary, 0.1);
+    border-color: rgba($color-secondary, 0.2);
+    color: darken($color-secondary, 15%);
+  }
+  
+  &.alert-accent {
+    background-color: rgba($color-accent, 0.1);
+    border-color: rgba($color-accent, 0.2);
+    color: darken($color-accent, 15%);
+  }
+  
+  &.alert-warning {
+    background-color: rgba($color-warning, 0.1);
+    border-color: rgba($color-warning, 0.2);
+    color: darken($color-warning, 15%);
+  }
+  
+  &.alert-error {
+    background-color: rgba($color-error, 0.1);
+    border-color: rgba($color-error, 0.2);
+    color: darken($color-error, 15%);
+  }
+  
+  // Alert with icon
+  &.alert-with-icon {
+    padding-left: 3.5rem;
+    
+    .alert-icon {
+      position: absolute;
+      top: $spacing-3;
+      left: $spacing-4;
+      font-size: 1.5rem;
+    }
+  }
+  
+  // Alert title
+  .alert-title {
+    font-weight: $font-weight-bold;
+    margin-bottom: $spacing-1;
+  }
+  
+  // Alert close button
+  .alert-close {
+    position: absolute;
+    top: $spacing-2;
+    right: $spacing-2;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    font-size: 1.25rem;
+    color: $color-gray-600;
+    
+    &:hover {
+      color: $color-gray-900;
+    }
+  }
+}
+
+/* Modal/Dialog */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba($color-black, 0.5);
+  z-index: $z-index-modal-backdrop;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-4;
+}
+
+.modal {
+  position: relative;
+  width: 100%;
+  max-width: 500px;
+  max-height: calc(100vh - #{$spacing-8});
+  overflow-y: auto;
+  background-color: $color-white;
+  border-radius: $border-radius-lg;
+  box-shadow: $shadow-lg;
+  z-index: $z-index-modal;
+  
+  &.modal-sm { max-width: 300px; }
+  &.modal-lg { max-width: 800px; }
+  &.modal-xl { max-width: 1140px; }
+  
+  .modal-header {
+    padding: $spacing-4;
+    border-bottom: 1px solid $color-gray-200;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    
+    .modal-title {
+      font-size: $font-size-xl;
+      font-weight: $font-weight-medium;
+      margin: 0;
+    }
+    
+    .modal-close {
+      background: transparent;
+      border: 0;
+      cursor: pointer;
+      font-size: 1.5rem;
+      color: $color-gray-600;
+      
+      &:hover {
+        color: $color-gray-900;
+      }
+    }
+  }
+  
+  .modal-body {
+    padding: $spacing-4;
+    overflow-y: auto;
+  }
+  
+  .modal-footer {
+    padding: $spacing-4;
+    border-top: 1px solid $color-gray-200;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: $spacing-3;
+  }
+}
+
+/* Empty State */
+.empty-state {
+  text-align: center;
+  padding: $spacing-8 $spacing-4;
+  
+  .empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: $spacing-4;
+    color: $color-gray-400;
+  }
+  
+  .empty-state-title {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-medium;
+    margin-bottom: $spacing-2;
+    color: $color-gray-800;
+  }
+  
+  .empty-state-message {
+    font-size: $font-size-md;
+    color: $color-gray-600;
+    margin-bottom: $spacing-4;
+    max-width: 450px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+  
+  .empty-state-actions {
+    display: flex;
+    justify-content: center;
+    gap: $spacing-3;
+  }
+}
+
+/* Divider */
+.divider {
+  display: block;
+  height: 1px;
+  background-color: $color-gray-200;
+  margin: $spacing-4 0;
+  
+  &.divider-vertical {
+    display: inline-block;
+    width: 1px;
+    height: 1em;
+    background-color: $color-gray-200;
+    margin: 0 $spacing-2;
+    vertical-align: middle;
+  }
+  
+  &.divider-dashed {
+    border-top: 1px dashed $color-gray-300;
+    background-color: transparent;
+  }
+  
+  &.divider-text {
+    display: flex;
+    align-items: center;
+    text-align: center;
+    color: $color-gray-600;
+    font-size: $font-size-sm;
+    
+    &::before,
+    &::after {
+      content: '';
+      flex: 1;
+      border-top: 1px solid $color-gray-200;
+    }
+    
+    &::before { margin-right: $spacing-3; }
+    &::after { margin-left: $spacing-3; }
+  }
+}
+
+/* Animations */
+@keyframes pulse-dot {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-enter {
+  opacity: 0;
+}
+
+.fade-enter-active {
+  opacity: 1;
+  transition: opacity 0.3s;
+}
+
+.fade-exit {
+  opacity: 1;
+}
+
+.fade-exit-active {
+  opacity: 0;
+  transition: opacity 0.3s;
+}

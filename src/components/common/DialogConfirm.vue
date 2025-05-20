@@ -1,68 +1,110 @@
 <template>
-  <v-dialog v-model="show" max-width="500">
-    <v-card>
-      <v-card-title>{{ title }}</v-card-title>
-      <v-card-text>
-        {{ message }}
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="grey-darken-1" variant="text" @click="cancel">{{ cancelText }}</v-btn>
-        <v-btn :color="confirmColor" variant="text" @click="confirm">{{ confirmText }}</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-dialog>
+  <div v-if="modelValue" class="modal-wrapper">
+    <div class="modal-overlay" @click="closeIfClickOutside && $emit('update:modelValue', false)">
+      <div class="modal" @click.stop>
+        <div class="modal-header">
+          <h3 class="modal-title">{{ title }}</h3>
+          <button 
+            v-if="showCloseButton" 
+            class="modal-close" 
+            @click="$emit('update:modelValue', false)"
+            aria-label="Close"
+          >
+            &times;
+          </button>
+        </div>
+        
+        <div class="modal-body">
+          <p v-if="message">{{ message }}</p>
+          <slot></slot>
+        </div>
+        
+        <div class="modal-footer">
+          <Button 
+            v-if="showCancelButton" 
+            :variant="cancelVariant" 
+            @click="onCancel"
+          >
+            {{ cancelText }}
+          </Button>
+          
+          <Button 
+            v-if="showConfirmButton" 
+            :variant="confirmVariant" 
+            @click="onConfirm"
+          >
+            {{ confirmText }}
+          </Button>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
-<script setup>
-import { ref, watch } from 'vue'
+<script>
+import Button from './Button.vue';
 
-const props = defineProps({
-  modelValue: {
-    type: Boolean,
-    default: false
+export default {
+  name: 'DialogConfirm',
+  components: {
+    Button
   },
-  title: {
-    type: String,
-    default: 'Confirm'
+  props: {
+    modelValue: {
+      type: Boolean,
+      default: false
+    },
+    title: {
+      type: String,
+      default: 'Confirm'
+    },
+    message: {
+      type: String,
+      default: ''
+    },
+    confirmText: {
+      type: String,
+      default: 'Confirm'
+    },
+    cancelText: {
+      type: String,
+      default: 'Cancel'
+    },
+    confirmVariant: {
+      type: String,
+      default: 'primary'
+    },
+    cancelVariant: {
+      type: String,
+      default: 'secondary'
+    },
+    showConfirmButton: {
+      type: Boolean,
+      default: true
+    },
+    showCancelButton: {
+      type: Boolean,
+      default: true
+    },
+    showCloseButton: {
+      type: Boolean,
+      default: true
+    },
+    closeIfClickOutside: {
+      type: Boolean,
+      default: true
+    }
   },
-  message: {
-    type: String,
-    default: 'Are you sure you want to proceed?'
-  },
-  confirmText: {
-    type: String,
-    default: 'Confirm'
-  },
-  cancelText: {
-    type: String,
-    default: 'Cancel'
-  },
-  confirmColor: {
-    type: String,
-    default: 'primary'
+  emits: ['update:modelValue', 'confirm', 'cancel'],
+  methods: {
+    onConfirm() {
+      this.$emit('confirm');
+      this.$emit('update:modelValue', false);
+    },
+    onCancel() {
+      this.$emit('cancel');
+      this.$emit('update:modelValue', false);
+    }
   }
-})
-
-const emit = defineEmits(['update:modelValue', 'confirm', 'cancel'])
-
-const show = ref(props.modelValue)
-
-watch(() => props.modelValue, (val) => {
-  show.value = val
-})
-
-watch(show, (val) => {
-  emit('update:modelValue', val)
-})
-
-const confirm = () => {
-  emit('confirm')
-  show.value = false
-}
-
-const cancel = () => {
-  emit('cancel')
-  show.value = false
-}
+};
 </script>

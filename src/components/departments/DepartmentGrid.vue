@@ -1,24 +1,23 @@
 <template>
   <div class="department-grid">
-    <h3 class="text-h6 font-weight-medium mb-3">Department Assignments</h3>
+    <h3 class="section-title mb-4">Department Assignments</h3>
     
     <!-- Loading State -->
     <div v-if="isLoading" class="text-center py-4">
-      <LoadingIndicator />
-      <p class="mt-2 text-medium-emphasis">Loading departments...</p>
+      <LoadingIndicator label="Loading departments..." />
     </div>
     
     <!-- Empty State -->
-    <div v-else-if="designationDepartments.length === 0" class="text-center py-6">
-      <v-icon icon="mdi-office-building" size="large" color="info" class="mb-3"></v-icon>
-      <h3 class="text-h6 mb-1">No Department Designations</h3>
-      <p class="text-body-2 mb-4">
+    <div v-else-if="designationDepartments.length === 0" class="empty-state py-6">
+      <span class="icon empty-state-icon">🏢</span>
+      <h3 class="empty-state-title mb-1">No Department Designations</h3>
+      <p class="empty-state-message mb-4">
         Please add department designations in the app settings.
       </p>
     </div>
     
     <!-- Department Grid -->
-    <div v-else class="grid">
+    <div v-else class="departments-grid">
       <DepartmentCard
         v-for="department in designationDepartments"
         :key="department.id"
@@ -87,19 +86,49 @@ const designationDepartments = computed(() => {
 })
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .department-grid {
-  margin-top: 24px;
+  margin-top: $spacing-6;
 }
 
-.grid {
+.section-title {
+  font-size: $font-size-lg;
+  font-weight: $font-weight-medium;
+}
+
+.departments-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 16px;
+  gap: $spacing-4;
 }
 
-@media (max-width: 600px) {
-  .grid {
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: $spacing-6;
+  
+  .empty-state-icon {
+    font-size: 2.5rem;
+    margin-bottom: $spacing-3;
+    color: $color-info;
+  }
+  
+  .empty-state-title {
+    font-size: $font-size-lg;
+    font-weight: $font-weight-medium;
+  }
+  
+  .empty-state-message {
+    font-size: $font-size-sm;
+    color: $color-gray-600;
+  }
+}
+
+@include responsive(sm) {
+  .departments-grid {
     grid-template-columns: 1fr;
   }
 }

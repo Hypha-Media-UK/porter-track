@@ -1,46 +1,43 @@
 <template>
-  <div class="ios-settings-view">
+  <div class="settings-view">
     <!-- Page Header -->
-    <header class="ios-settings-view__header">
-      <h1 class="text-h4 font-weight-medium">Settings</h1>
+    <header class="page-header">
+      <h1 class="page-title">Settings</h1>
     </header>
 
     <!-- Tab Navigation -->
-    <div class="ios-settings-view__tabs">
-      <v-tabs
-        v-model="currentTab"
-        color="primary"
-        centered
-        show-arrows
-        class="mb-6 ios-tabs"
-        slider-color="primary"
-        bg-color="transparent"
-      >
-        <v-tab value="buildings" class="ios-tab" active-class="ios-tab--active">Buildings</v-tab>
-        <v-tab value="tasks" class="ios-tab" active-class="ios-tab--active">Tasks</v-tab>
-        <v-tab value="staff" class="ios-tab" active-class="ios-tab--active">Staff</v-tab>
-        <v-tab value="app" class="ios-tab" active-class="ios-tab--active">App Settings</v-tab>
-      </v-tabs>
+    <div class="settings-tabs">
+      <ul class="tab-list">
+        <li 
+          v-for="tab in tabs" 
+          :key="tab.value"
+          class="tab-item"
+          :class="{ 'active': currentTab === tab.value }"
+          @click="currentTab = tab.value"
+        >
+          {{ tab.label }}
+        </li>
+      </ul>
     </div>
 
     <!-- Tab Contents -->
-    <v-window v-model="currentTab" class="ios-settings-view__content">
-      <v-window-item value="buildings">
+    <div class="tab-content">
+      <div v-show="currentTab === 'buildings'" class="tab-panel">
         <BuildingsTab />
-      </v-window-item>
+      </div>
       
-      <v-window-item value="tasks">
+      <div v-show="currentTab === 'tasks'" class="tab-panel">
         <TasksTab />
-      </v-window-item>
+      </div>
       
-      <v-window-item value="staff">
+      <div v-show="currentTab === 'staff'" class="tab-panel">
         <StaffTab />
-      </v-window-item>
+      </div>
       
-      <v-window-item value="app">
+      <div v-show="currentTab === 'app'" class="tab-panel">
         <AppSettingsTab />
-      </v-window-item>
-    </v-window>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -63,9 +60,17 @@ const route = useRoute()
 const router = useRouter()
 const currentTab = ref(props.activeTab)
 
+// Tab definitions
+const tabs = [
+  { value: 'buildings', label: 'Buildings' },
+  { value: 'tasks', label: 'Tasks' },
+  { value: 'staff', label: 'Staff' },
+  { value: 'app', label: 'App Settings' }
+]
+
 // Watch for direct URL navigation with query params
 watch(() => route.query.tab, (newTab) => {
-  if (newTab && ['buildings', 'tasks', 'staff', 'app'].includes(newTab)) {
+  if (newTab && tabs.some(tab => tab.value === newTab)) {
     currentTab.value = newTab
   }
 })
@@ -81,104 +86,106 @@ watch(currentTab, (newTab) => {
 onMounted(() => {
   // If URL has a tab query param, use it
   const tabParam = route.query.tab
-  if (tabParam && ['buildings', 'tasks', 'staff', 'app'].includes(tabParam)) {
+  if (tabParam && tabs.some(tab => tab.value === tabParam)) {
     currentTab.value = tabParam
   }
 })
 </script>
 
-<style scoped>
-.ios-settings-view {
+<style lang="scss" scoped>
+.settings-view {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 16px;
+  padding: $spacing-4;
   height: 100%;
+  
+  @include responsive(md) {
+    padding: $spacing-6;
+  }
 }
 
-.ios-settings-view__header {
-  padding: 16px 0;
+.page-header {
+  padding: $spacing-4 0;
   text-align: center;
+  
+  @include responsive(md) {
+    padding: $spacing-6 0;
+  }
 }
 
-.ios-tabs {
-  padding: 4px;
-  background-color: transparent;
-  position: relative;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+.page-title {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-medium;
+  margin: 0;
 }
 
-.ios-tab {
+.settings-tabs {
+  margin-bottom: $spacing-6;
+}
+
+.tab-list {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  border-bottom: 1px solid $color-gray-200;
+  overflow-x: auto;
+  
+  // Allow overflow scrolling on smaller screens
+  -webkit-overflow-scrolling: touch;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+  scrollbar-width: none;
+}
+
+.tab-item {
+  padding: $spacing-3 $spacing-4;
   min-width: 120px;
-  font-weight: 400;
-  transition: all 0.2s ease;
+  font-weight: $font-weight-normal;
+  color: $color-gray-600;
+  cursor: pointer;
+  text-align: center;
+  transition: $transition-base;
   position: relative;
-  opacity: 0.7;
-  border-radius: 0 !important;
-  background-color: transparent !important;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: transparent;
+    transition: $transition-base;
+  }
+  
+  &.active {
+    color: $color-primary;
+    font-weight: $font-weight-medium;
+    
+    &::after {
+      background-color: $color-primary;
+    }
+  }
+  
+  &:hover:not(.active) {
+    color: $color-gray-800;
+  }
 }
 
-.ios-tab--active {
-  font-weight: 500;
-  opacity: 1;
-  color: #007AFF !important;
-  background-color: transparent !important;
-}
-
-/* Override Vuetify's default tab styling */
-:deep(.v-tab--selected) {
-  background-color: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-:deep(.v-tab) {
-  box-shadow: none !important;
-  border: none !important;
-  outline: none !important;
-}
-
-:deep(.v-tab:before),
-:deep(.v-tab:after) {
-  display: none !important;
-}
-
-:deep(.v-tabs__container),
-:deep(.v-tabs-bar) {
-  background-color: transparent !important;
-  border: none !important;
-}
-
-/* Customizing Vuetify's tab slider */
-:deep(.v-tabs-slider) {
-  height: 2px !important;
-  background-color: #007AFF !important;
-}
-
-.ios-settings-view__content {
+.tab-content {
   min-height: 400px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .ios-tabs {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  
-  .ios-tab--active {
-    color: #0A84FF !important;
-  }
-  
-  :deep(.v-tabs-slider) {
-    background-color: #0A84FF !important;
-  }
+.tab-panel {
+  animation: fadeIn 0.3s ease-in-out;
 }
 
-@media (min-width: 768px) {
-  .ios-settings-view {
-    padding: 24px;
-  }
-  
-  .ios-settings-view__header {
-    padding: 24px 0;
-  }
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 </style>

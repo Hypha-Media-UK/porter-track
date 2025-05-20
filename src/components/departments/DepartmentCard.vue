@@ -1,29 +1,29 @@
 <template>
-  <IOSCard class="department-card">
-    <div class="ios-card-header">
-      <div class="d-flex justify-space-between align-center">
+  <Card class="department-card">
+    <template #header>
+      <div class="flex-between">
         <div>
-          <h3 class="text-subtitle-1 font-weight-medium">{{ department.name }}</h3>
-          <p v-if="department.building" class="text-caption text-medium-emphasis">
+          <h3 class="card-title">{{ department.name }}</h3>
+          <p v-if="department.building" class="card-subtitle text-gray-600">
             {{ department.building.name }}
           </p>
         </div>
-        <v-chip
+        <Badge 
           v-if="assignedPorters.length > 0"
-          size="small"
-          color="primary"
+          variant="primary"
+          size="sm"
           class="ml-2"
         >
           {{ assignedPorters.length }}
-        </v-chip>
+        </Badge>
       </div>
-    </div>
+    </template>
     
-    <div class="ios-card-content">
+    <div class="card-body">
       <!-- Empty State -->
-      <div v-if="assignedPorters.length === 0" class="text-center py-3">
-        <v-icon icon="mdi-account-off" color="info" size="small" class="mb-1"></v-icon>
-        <p class="text-caption text-medium-emphasis">No porters assigned</p>
+      <div v-if="assignedPorters.length === 0" class="empty-state py-3">
+        <span class="icon text-info fs-xl mb-1">🧑</span>
+        <p class="text-gray-600 fs-sm">No porters assigned</p>
       </div>
       
       <!-- Assigned Porters List -->
@@ -35,49 +35,45 @@
           @click="$emit('edit-porter-times', porter)"
           :class="{'clickable': isShiftActive}"
         >
-          <div class="d-flex align-center justify-space-between">
-            <div class="d-flex align-center">
-              <v-avatar size="28" color="primary" class="mr-2">
-                <v-icon icon="mdi-account" color="white" size="small"></v-icon>
-              </v-avatar>
+          <div class="flex-between">
+            <div class="porter-info-container">
+              <div class="porter-avatar">
+                <span class="icon">👤</span>
+              </div>
               <div class="porter-info">
-                <div class="text-body-1">{{ porter.name }}</div>
-                <div class="designation-badge" v-if="getPorterDesignation(porter)">
+                <div class="porter-name">{{ porter.name }}</div>
+                <div v-if="getPorterDesignation(porter)" class="mt-1">
                   <StatusBadge 
                     :label="getPorterDesignation(porter).name" 
                     status="info"
-                    :icon="false"
-                    class="mt-1"
                   />
                 </div>
               </div>
             </div>
             
             <div class="porter-actions">
-              <v-btn
+              <Button
                 variant="text"
-                color="warning"
-                size="x-small"
-                icon="mdi-account-convert"
-                @click="$emit('unassign-porter', porter)"
+                size="sm"
+                iconLeft="❌"
+                @click.stop="$emit('unassign-porter', porter)"
                 :disabled="!isShiftActive"
-              >
-                <v-tooltip activator="parent" location="top">
-                  Return to Porters Pool
-                </v-tooltip>
-              </v-btn>
+                title="Return to Porters Pool"
+              />
             </div>
           </div>
         </div>
       </div>
     </div>
-  </IOSCard>
+  </Card>
 </template>
 
 <script setup>
 import { computed } from 'vue'
-import IOSCard from '../common/IOSCard.vue'
+import Card from '../common/Card.vue'
 import StatusBadge from '../common/StatusBadge.vue'
+import Badge from '../common/Badge.vue'
+import Button from '../common/Button.vue'
 
 const props = defineProps({
   department: {
@@ -143,17 +139,27 @@ const getPorterDesignation = (porter) => {
 }
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 .department-card {
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-.ios-card-content {
+.card-body {
   flex: 1;
   display: flex;
   flex-direction: column;
+}
+
+.card-title {
+  font-size: $font-size-md;
+  font-weight: $font-weight-medium;
+  margin-bottom: 0.25rem;
+}
+
+.card-subtitle {
+  font-size: $font-size-xs;
 }
 
 .assigned-porters-list {
@@ -162,23 +168,41 @@ const getPorterDesignation = (porter) => {
 }
 
 .porter-item {
-  padding: 8px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-.porter-item:last-child {
-  border-bottom: none;
+  padding: $spacing-2 0;
+  border-bottom: 1px solid $color-gray-200;
+  
+  &:last-child {
+    border-bottom: none;
+  }
 }
 
 .clickable {
   cursor: pointer;
   transition: background-color 0.2s;
-  border-radius: 4px;
-  padding: 8px 4px;
+  border-radius: $border-radius;
+  padding: $spacing-2 $spacing-1;
+  
+  &:hover {
+    background-color: $color-gray-100;
+  }
 }
 
-.clickable:hover {
-  background-color: rgba(0, 0, 0, 0.05);
+.porter-info-container {
+  display: flex;
+  align-items: center;
+  gap: $spacing-2;
+}
+
+.porter-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background-color: $color-primary;
+  color: $color-white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
 }
 
 .porter-info {
@@ -186,13 +210,17 @@ const getPorterDesignation = (porter) => {
   min-width: 0;
 }
 
-.designation-badge {
-  margin-top: -4px;
+.porter-name {
+  font-weight: $font-weight-medium;
+  font-size: $font-size-sm;
 }
 
-@media (prefers-color-scheme: dark) {
-  .porter-item {
-    border-bottom-color: rgba(255, 255, 255, 0.08);
-  }
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-3;
+  text-align: center;
 }
 </style>

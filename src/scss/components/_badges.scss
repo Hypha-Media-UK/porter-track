@@ -1,0 +1,222 @@
+/* Badges and Status Indicators */
+
+// Badge base style
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: $spacing-1 $spacing-2;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  border-radius: $border-radius-pill;
+  
+  // Basic badge colors
+  &.badge-primary {
+    background-color: $color-primary;
+    color: $color-white;
+  }
+  
+  &.badge-secondary {
+    background-color: $color-secondary;
+    color: $color-white;
+  }
+  
+  &.badge-accent {
+    background-color: $color-accent;
+    color: $color-white;
+  }
+  
+  &.badge-warning {
+    background-color: $color-warning;
+    color: $color-white;
+  }
+  
+  &.badge-error {
+    background-color: $color-error;
+    color: $color-white;
+  }
+  
+  // Subtle badge variants
+  &.badge-subtle-primary {
+    background-color: rgba($color-primary, 0.15);
+    color: darken($color-primary, 10%);
+  }
+  
+  &.badge-subtle-secondary {
+    background-color: rgba($color-secondary, 0.15);
+    color: darken($color-secondary, 10%);
+  }
+  
+  &.badge-subtle-accent {
+    background-color: rgba($color-accent, 0.15);
+    color: darken($color-accent, 10%);
+  }
+  
+  &.badge-subtle-warning {
+    background-color: rgba($color-warning, 0.15);
+    color: darken($color-warning, 10%);
+  }
+  
+  &.badge-subtle-error {
+    background-color: rgba($color-error, 0.15);
+    color: darken($color-error, 10%);
+  }
+  
+  // Outlined badge variants
+  &.badge-outline-primary {
+    background-color: transparent;
+    color: $color-primary;
+    border: 1px solid $color-primary;
+  }
+  
+  &.badge-outline-secondary {
+    background-color: transparent;
+    color: $color-secondary;
+    border: 1px solid $color-secondary;
+  }
+  
+  &.badge-outline-accent {
+    background-color: transparent;
+    color: $color-accent;
+    border: 1px solid $color-accent;
+  }
+  
+  &.badge-outline-warning {
+    background-color: transparent;
+    color: $color-warning;
+    border: 1px solid $color-warning;
+  }
+  
+  &.badge-outline-error {
+    background-color: transparent;
+    color: $color-error;
+    border: 1px solid $color-error;
+  }
+  
+  // Badge with dot indicator
+  &.badge-dot {
+    position: relative;
+    padding-left: $spacing-4;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      left: $spacing-2;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: currentColor;
+    }
+  }
+  
+  // Badge with icon
+  &.badge-icon {
+    .icon {
+      margin-right: $spacing-1;
+      font-size: 1.2em;
+      line-height: 0;
+    }
+  }
+  
+  // Badge sizes
+  &.badge-sm {
+    padding: 0.15rem 0.4rem;
+    font-size: 0.65rem;
+  }
+  
+  &.badge-lg {
+    padding: $spacing-1 $spacing-3;
+    font-size: $font-size-sm;
+  }
+}
+
+// Status indicator (dots)
+.status-indicator {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  
+  &.status-success {
+    background-color: $color-accent;
+  }
+  
+  &.status-warning {
+    background-color: $color-warning;
+  }
+  
+  &.status-error {
+    background-color: $color-error;
+  }
+  
+  &.status-info {
+    background-color: $color-primary;
+  }
+  
+  &.status-neutral {
+    background-color: $color-secondary;
+  }
+  
+  // Pulsing effect for active status
+  &.status-active {
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background-color: inherit;
+      opacity: 0.4;
+      transform: scale(1);
+      animation: pulse 2s infinite;
+    }
+  }
+  
+  // Sizes
+  &.status-sm {
+    width: 6px;
+    height: 6px;
+  }
+  
+  &.status-lg {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+// Status badge (combines indicator and text)
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  
+  .status-indicator {
+    margin-right: $spacing-2;
+  }
+}
+
+// Pulse animation
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  70% {
+    transform: scale(2);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
