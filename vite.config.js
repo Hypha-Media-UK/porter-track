@@ -18,6 +18,18 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-    },
+      // Add alias for MDI fonts
+      '@mdi/font': path.resolve(__dirname, 'node_modules/@mdi/font')
+    }
+  },
+  // Ensure node_modules files are properly served
+  server: {
+    fs: {
+      // Allow serving files from one level up from project root
+      allow: ['..']
+    }
+  },
+  optimizeDeps: {
+    include: ['@mdi/font']
   }
 })

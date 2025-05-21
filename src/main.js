@@ -3,6 +3,9 @@ import { createPinia } from 'pinia'
 import router from './router'
 import App from './App.vue'
 
+// Import Material Design Icons
+import '@mdi/font/css/materialdesignicons.css'
+
 // Import our custom SCSS
 import './scss/main.scss'
 

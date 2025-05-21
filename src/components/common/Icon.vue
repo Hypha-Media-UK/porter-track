@@ -16,6 +16,11 @@
       </svg>
     </template>
     
+    <!-- Material Design Icons -->
+    <template v-else-if="type === 'md'">
+      <i :class="`mdi mdi-${getMaterialIcon()}`" :style="{ fontSize: size }"></i>
+    </template>
+    
     <!-- HTML entity or Unicode symbols -->
     <template v-else>
       {{ getIconSymbol() }}
@@ -37,8 +42,8 @@ const props = defineProps({
   },
   type: {
     type: String,
-    default: 'symbol',
-    validator: (value) => ['symbol', 'svg'].includes(value)
+    default: 'md',
+    validator: (value) => ['symbol', 'svg', 'md'].includes(value)
   },
   color: {
     type: String,
@@ -59,7 +64,58 @@ const svgPath = computed(() => {
   return null
 })
 
-// Get the icon symbol based on name
+// Get the material design icon name
+function getMaterialIcon() {
+  // Map our icon names to Material Design icon names
+  const mdIconMap = {
+    // Navigation icons
+    'home': 'home',
+    'back': 'arrow-left',
+    'forward': 'arrow-right',
+    'settings': 'cog',
+    'menu': 'menu',
+    'add': 'plus',
+    'remove': 'minus',
+    'close': 'close',
+    'search': 'magnify',
+    
+    // Action icons
+    'check': 'check',
+    'calendar': 'calendar',
+    'clock': 'clock-outline',
+    'edit': 'pencil',
+    'delete': 'delete',
+    'save': 'content-save',
+    'download': 'download',
+    'upload': 'upload',
+    'refresh': 'refresh',
+    
+    // Status icons
+    'info': 'information',
+    'warning': 'alert',
+    'error': 'alert-circle',
+    'success': 'check-circle',
+    
+    // Content icons
+    'user': 'account',
+    'users': 'account-group',
+    'message': 'message',
+    'notification': 'bell',
+    'favorite': 'star',
+    'heart': 'heart',
+    'mail': 'email',
+    'phone': 'phone',
+    'location': 'map-marker',
+    'file': 'file',
+    'folder': 'folder',
+    'building': 'office-building',
+    'department': 'sitemap'
+  }
+  
+  return mdIconMap[props.name] || `${props.name}`
+}
+
+// Get the icon symbol based on name (for backward compatibility)
 function getIconSymbol() {
   // Map icon names to simple line-based symbols (Unicode)
   const iconMap = {
@@ -121,5 +177,9 @@ function getIconSymbol() {
   line-height: 0;
   vertical-align: middle;
   font-style: normal;
+  
+  i {
+    line-height: 1;
+  }
 }
 </style>

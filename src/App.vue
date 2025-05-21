@@ -4,7 +4,7 @@
     <header class="app-header">
       <div v-if="shouldShowBackButton" class="header-with-back">
         <button class="back-button" @click="goBack">
-          <span class="icon back-icon">&larr;</span>
+          <Icon name="back" class="back-icon" />
           <span>Back</span>
         </button>
         <h1 class="app-header-title">{{ pageTitle }}</h1>
@@ -22,7 +22,7 @@
               :class="{ active: $route.path === '/' }"
               :to="{ path: '/' }"
             >
-              <span class="icon">&#8962;</span>
+              <Icon name="home" />
             </router-link>
           </li>
           
@@ -32,7 +32,7 @@
               :class="{ active: $route.path === '/shifts' && !$route.params.id }"
               :to="{ path: '/shifts' }"
             >
-              <span class="icon">&#8986;</span>
+              <Icon name="clock" />
             </router-link>
           </li>
           
@@ -42,7 +42,7 @@
               :class="{ active: $route.path === '/settings' }"
               :to="{ path: '/settings', query: { tab: 'app' } }"
             >
-              <span class="icon">&#9881;</span>
+              <Icon name="settings" />
             </router-link>
           </li>
           
@@ -52,7 +52,7 @@
               :class="{ active: $route.path.startsWith('/shifts/') }"
               :to="{ name: 'ShiftManagement', params: { id: activeShift.id } }"
             >
-              <span class="icon">&#128197;</span>
+              <Icon name="calendar" />
             </router-link>
           </li>
         </ul>
@@ -76,6 +76,7 @@
 import { computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useShiftsStore } from './stores/shifts'
+import Icon from './components/common/Icon.vue'
 
 const route = useRoute()
 const router = useRouter()
