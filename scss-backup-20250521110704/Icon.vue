@@ -178,6 +178,7 @@ function getIconSymbol() {
 </script>
 
 <style lang="scss" scoped>
+/* Import the stylesheet at the top */
 @use '../../scss/index' as s;
 
 .icon {

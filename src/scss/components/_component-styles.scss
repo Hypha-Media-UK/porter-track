@@ -1,0 +1,166 @@
+/* Component Styles Library */
+
+@use 'sass:color';
+@use '../variables' as v;
+@use '../mixins' as m;
+
+// Standard Card style
+@mixin card {
+  background-color: v.$color-white;
+  border-radius: v.$border-radius-lg;
+  box-shadow: v.$shadow-sm;
+  overflow: hidden; // Ensures border radius is respected by inner elements
+  transition: v.$transition-base;
+  
+  &:hover {
+    box-shadow: v.$shadow-md;
+  }
+}
+
+// Card with header
+@mixin card-with-header {
+  @include card;
+  
+  .card-header {
+    padding: v.$spacing-4;
+    border-bottom: 1px solid v.$color-gray-200;
+    background-color: v.$color-gray-50;
+    
+    .card-title {
+      font-size: v.$font-size-lg;
+      font-weight: v.$font-weight-medium;
+      margin: 0;
+    }
+  }
+  
+  .card-body {
+    padding: v.$spacing-4;
+  }
+  
+  .card-footer {
+    padding: v.$spacing-4;
+    border-top: 1px solid v.$color-gray-200;
+    background-color: v.$color-gray-50;
+  }
+}
+
+// List item styles
+@mixin list-item {
+  display: flex;
+  align-items: center;
+  padding: v.$spacing-3 v.$spacing-4;
+  border-bottom: 1px solid v.$color-gray-200;
+  transition: v.$transition-base;
+  
+  &:last-child {
+    border-bottom: none;
+  }
+  
+  &:hover {
+    background-color: v.$color-gray-50;
+  }
+}
+
+// Input fields
+@mixin input-field {
+  display: block;
+  width: 100%;
+  padding: v.$spacing-2 v.$spacing-3;
+  border: 1px solid v.$color-gray-300;
+  border-radius: v.$border-radius-md;
+  font-size: v.$font-size-md;
+  line-height: 1.5;
+  transition: v.$transition-base;
+  
+  &:focus {
+    outline: none;
+    border-color: v.$color-primary;
+    box-shadow: 0 0 0 3px rgba(v.$color-primary, 0.1);
+  }
+  
+  &:disabled {
+    background-color: v.$color-gray-100;
+    cursor: not-allowed;
+  }
+}
+
+// Form group
+@mixin form-group {
+  margin-bottom: v.$spacing-4;
+  
+  .form-label {
+    display: block;
+    margin-bottom: v.$spacing-1;
+    font-weight: v.$font-weight-medium;
+  }
+  
+  .form-text {
+    display: block;
+    margin-top: v.$spacing-1;
+    font-size: v.$font-size-sm;
+    color: v.$color-gray-600;
+  }
+}
+
+// Badge
+@mixin badge($bg-color: v.$color-primary) {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: v.$spacing-1 v.$spacing-2;
+  font-size: v.$font-size-xs;
+  font-weight: v.$font-weight-medium;
+  line-height: 1;
+  border-radius: v.$border-radius-pill;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background-color: $bg-color;
+  color: v.$color-white;
+}
+
+// Empty state
+@mixin empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: v.$spacing-6;
+  
+  .empty-state-icon {
+    font-size: 3rem;
+    margin-bottom: v.$spacing-4;
+    color: v.$color-gray-400;
+  }
+  
+  .empty-state-title {
+    font-size: v.$font-size-xl;
+    font-weight: v.$font-weight-medium;
+    margin-bottom: v.$spacing-2;
+    color: v.$color-gray-800;
+  }
+  
+  .empty-state-text {
+    font-size: v.$font-size-md;
+    color: v.$color-gray-600;
+    margin-bottom: v.$spacing-4;
+    max-width: 450px;
+  }
+}
+
+// Loading indicator
+@mixin loading-indicator {
+  display: inline-block;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 50%;
+  border: 2px solid v.$color-gray-300;
+  border-top-color: v.$color-primary;
+  animation: spin 0.75s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

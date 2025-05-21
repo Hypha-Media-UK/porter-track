@@ -1,72 +1,76 @@
 /* Button Styles */
 
+@use 'sass:color';
+@use '../variables' as v;
+@use '../mixins' as m;
+
 .btn {
-  @include button-base;
-  gap: $spacing-2;
+  @include m.button-base;
+  gap: v.$spacing-2;
   
   // Button variants
   &.btn-primary {
-    background-color: $color-primary;
-    color: $color-white;
+    background-color: v.$color-primary;
+    color: v.$color-white;
     
     &:hover, &:focus {
-      background-color: darken($color-primary, 10%);
+      background-color: color.adjust(v.$color-primary, $lightness: -10%);
     }
     
     &:active {
-      background-color: darken($color-primary, 15%);
+      background-color: color.adjust(v.$color-primary, $lightness: -15%);
     }
   }
   
   &.btn-secondary {
-    background-color: $color-secondary;
-    color: $color-white;
+    background-color: v.$color-secondary;
+    color: v.$color-white;
     
     &:hover, &:focus {
-      background-color: darken($color-secondary, 10%);
+      background-color: color.adjust(v.$color-secondary, $lightness: -10%);
     }
     
     &:active {
-      background-color: darken($color-secondary, 15%);
+      background-color: color.adjust(v.$color-secondary, $lightness: -15%);
     }
   }
   
   &.btn-accent {
-    background-color: $color-accent;
-    color: $color-white;
+    background-color: v.$color-accent;
+    color: v.$color-white;
     
     &:hover, &:focus {
-      background-color: darken($color-accent, 10%);
+      background-color: color.adjust(v.$color-accent, $lightness: -10%);
     }
     
     &:active {
-      background-color: darken($color-accent, 15%);
+      background-color: color.adjust(v.$color-accent, $lightness: -15%);
     }
   }
   
   &.btn-error {
-    background-color: $color-error;
-    color: $color-white;
+    background-color: v.$color-error;
+    color: v.$color-white;
     
     &:hover, &:focus {
-      background-color: darken($color-error, 10%);
+      background-color: color.adjust(v.$color-error, $lightness: -10%);
     }
     
     &:active {
-      background-color: darken($color-error, 15%);
+      background-color: color.adjust(v.$color-error, $lightness: -15%);
     }
   }
   
   &.btn-warning {
-    background-color: $color-warning;
-    color: $color-white;
+    background-color: v.$color-warning;
+    color: v.$color-white;
     
     &:hover, &:focus {
-      background-color: darken($color-warning, 10%);
+      background-color: color.adjust(v.$color-warning, $lightness: -10%);
     }
     
     &:active {
-      background-color: darken($color-warning, 15%);
+      background-color: color.adjust(v.$color-warning, $lightness: -15%);
     }
   }
   
@@ -75,62 +79,62 @@
     border: 1px solid currentColor;
     
     &.btn-primary {
-      color: $color-primary;
+      color: v.$color-primary;
       
       &:hover, &:focus {
-        background-color: rgba($color-primary, 0.1);
+        background-color: rgba(v.$color-primary, 0.1);
       }
       
       &:active {
-        background-color: rgba($color-primary, 0.2);
+        background-color: rgba(v.$color-primary, 0.2);
       }
     }
     
     &.btn-secondary {
-      color: $color-secondary;
+      color: v.$color-secondary;
       
       &:hover, &:focus {
-        background-color: rgba($color-secondary, 0.1);
+        background-color: rgba(v.$color-secondary, 0.1);
       }
       
       &:active {
-        background-color: rgba($color-secondary, 0.2);
+        background-color: rgba(v.$color-secondary, 0.2);
       }
     }
     
     &.btn-accent {
-      color: $color-accent;
+      color: v.$color-accent;
       
       &:hover, &:focus {
-        background-color: rgba($color-accent, 0.1);
+        background-color: rgba(v.$color-accent, 0.1);
       }
       
       &:active {
-        background-color: rgba($color-accent, 0.2);
+        background-color: rgba(v.$color-accent, 0.2);
       }
     }
     
     &.btn-error {
-      color: $color-error;
+      color: v.$color-error;
       
       &:hover, &:focus {
-        background-color: rgba($color-error, 0.1);
+        background-color: rgba(v.$color-error, 0.1);
       }
       
       &:active {
-        background-color: rgba($color-error, 0.2);
+        background-color: rgba(v.$color-error, 0.2);
       }
     }
     
     &.btn-warning {
-      color: $color-warning;
+      color: v.$color-warning;
       
       &:hover, &:focus {
-        background-color: rgba($color-warning, 0.1);
+        background-color: rgba(v.$color-warning, 0.1);
       }
       
       &:active {
-        background-color: rgba($color-warning, 0.2);
+        background-color: rgba(v.$color-warning, 0.2);
       }
     }
   }
@@ -139,75 +143,75 @@
     background-color: transparent;
     
     &.btn-primary {
-      color: $color-primary;
+      color: v.$color-primary;
       
       &:hover, &:focus {
-        background-color: rgba($color-primary, 0.1);
+        background-color: rgba(v.$color-primary, 0.1);
       }
       
       &:active {
-        background-color: rgba($color-primary, 0.2);
+        background-color: rgba(v.$color-primary, 0.2);
       }
     }
     
     &.btn-secondary {
-      color: $color-secondary;
+      color: v.$color-secondary;
       
       &:hover, &:focus {
-        background-color: rgba($color-secondary, 0.1);
+        background-color: rgba(v.$color-secondary, 0.1);
       }
       
       &:active {
-        background-color: rgba($color-secondary, 0.2);
+        background-color: rgba(v.$color-secondary, 0.2);
       }
     }
     
     &.btn-accent {
-      color: $color-accent;
+      color: v.$color-accent;
       
       &:hover, &:focus {
-        background-color: rgba($color-accent, 0.1);
+        background-color: rgba(v.$color-accent, 0.1);
       }
       
       &:active {
-        background-color: rgba($color-accent, 0.2);
+        background-color: rgba(v.$color-accent, 0.2);
       }
     }
     
     &.btn-error {
-      color: $color-error;
+      color: v.$color-error;
       
       &:hover, &:focus {
-        background-color: rgba($color-error, 0.1);
+        background-color: rgba(v.$color-error, 0.1);
       }
       
       &:active {
-        background-color: rgba($color-error, 0.2);
+        background-color: rgba(v.$color-error, 0.2);
       }
     }
     
     &.btn-warning {
-      color: $color-warning;
+      color: v.$color-warning;
       
       &:hover, &:focus {
-        background-color: rgba($color-warning, 0.1);
+        background-color: rgba(v.$color-warning, 0.1);
       }
       
       &:active {
-        background-color: rgba($color-warning, 0.2);
+        background-color: rgba(v.$color-warning, 0.2);
       }
     }
   }
   
   // Button sizes
   &.btn-sm {
-    font-size: $font-size-sm;
-    padding: $spacing-1 $spacing-3;
+    font-size: v.$font-size-sm;
+    padding: v.$spacing-1 v.$spacing-3;
   }
   
   &.btn-lg {
-    font-size: $font-size-lg;
-    padding: $spacing-3 $spacing-6;
+    font-size: v.$font-size-lg;
+    padding: v.$spacing-3 v.$spacing-6;
   }
   
   // Button with icon
@@ -222,11 +226,11 @@
     }
     
     &.icon-left .icon {
-      margin-right: $spacing-2;
+      margin-right: v.$spacing-2;
     }
     
     &.icon-right .icon {
-      margin-left: $spacing-2;
+      margin-left: v.$spacing-2;
     }
   }
   
@@ -294,13 +298,13 @@
     border-radius: 0;
     
     &:first-child {
-      border-top-left-radius: $border-radius-md;
-      border-bottom-left-radius: $border-radius-md;
+      border-top-left-radius: v.$border-radius-md;
+      border-bottom-left-radius: v.$border-radius-md;
     }
     
     &:last-child {
-      border-top-right-radius: $border-radius-md;
-      border-bottom-right-radius: $border-radius-md;
+      border-top-right-radius: v.$border-radius-md;
+      border-bottom-right-radius: v.$border-radius-md;
     }
     
     &:not(:first-child) {

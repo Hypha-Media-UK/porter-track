@@ -100,6 +100,7 @@ onMounted(async () => {
 </script>
 
 <style lang="scss" scoped>
+/* Import the stylesheet at the top */
 @use './scss/index' as s;
 
 .header-with-title {

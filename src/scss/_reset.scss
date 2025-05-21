@@ -1,6 +1,9 @@
-/* Modern CSS Reset */
+/* Reset Styles */
 
-/* Box sizing */
+@use 'sass:color';
+@use 'variables' as v;
+
+/* Box sizing rules */
 *,
 *::before,
 *::after {
@@ -10,8 +13,6 @@
 /* Remove default margin and padding */
 html,
 body,
-div,
-span,
 h1,
 h2,
 h3,
@@ -19,149 +20,109 @@ h4,
 h5,
 h6,
 p,
-blockquote,
-pre,
-a,
-abbr,
-address,
-cite,
-code,
-del,
-dfn,
-em,
-img,
-ins,
-kbd,
-q,
-s,
-samp,
-small,
-strong,
-sub,
-sup,
-var,
-b,
-u,
-i,
-dl,
-dt,
-dd,
 ol,
 ul,
 li,
-fieldset,
-form,
-label,
-legend,
-table,
-caption,
-tbody,
-tfoot,
-thead,
-tr,
-th,
-td {
+figure,
+figcaption,
+blockquote,
+dl,
+dd {
   margin: 0;
   padding: 0;
-  border: 0;
-  vertical-align: baseline;
 }
 
-/* Typography */
-html {
-  font-size: 16px;
-  line-height: 1.5;
-  -webkit-text-size-adjust: 100%;
-}
-
+/* Set core body defaults */
 body {
-  font-family: $font-family-base;
-  font-size: $font-size-base;
-  line-height: $line-height-base;
-  color: $color-gray-900;
-  background-color: $color-gray-100;
+  min-height: 100vh;
+  scroll-behavior: smooth;
+  text-rendering: optimizeSpeed;
+  line-height: v.$line-height-base;
+  font-family: v.$font-family-base;
+  font-size: v.$font-size-base;
+  color: v.$color-gray-900;
+  background-color: v.$color-gray-100;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-/* Remove list styles */
-ol,
-ul {
-  list-style: none;
-}
-
-/* Links */
-a {
-  color: $color-primary;
-  text-decoration: none;
-  background-color: transparent;
-  
-  &:hover {
-    color: darken($color-primary, 10%);
-    text-decoration: underline;
-  }
-}
-
-/* Media */
-img,
-svg,
-video,
-canvas,
-audio,
-iframe,
-embed,
-object {
-  display: block;
+/* Make images easier to work with */
+img {
   max-width: 100%;
-  height: auto;
+  display: block;
 }
 
-/* Form elements */
-button,
+/* Inherit fonts for inputs and buttons */
 input,
-optgroup,
-select,
-textarea {
-  font-family: inherit;
-  font-size: 100%;
-  line-height: 1.15;
-  margin: 0;
-}
-
 button,
-input {
-  overflow: visible;
-}
-
-button,
+textarea,
 select {
-  text-transform: none;
+  font: inherit;
 }
 
-button,
-[type="button"],
-[type="reset"],
-[type="submit"] {
-  -webkit-appearance: button;
-  appearance: button;
-}
-
-button::-moz-focus-inner,
-[type="button"]::-moz-focus-inner,
-[type="reset"]::-moz-focus-inner,
-[type="submit"]::-moz-focus-inner {
-  border-style: none;
-  padding: 0;
-}
-
-/* Remove animations for users who prefer reduced motion */
+/* Remove all animations and transitions for people that prefer not to see them */
 @media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
+  * {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
   }
+}
+
+/* Links */
+a {
+  color: v.$color-primary;
+  text-decoration: none;
+  
+  &:hover {
+    text-decoration: underline;
+    color: color.adjust(v.$color-primary, $lightness: -10%);
+  }
+}
+
+/* Headings */
+h1, h2, h3, h4, h5, h6 {
+  margin-bottom: 0.5em;
+  font-weight: v.$font-weight-bold;
+  line-height: v.$line-height-heading;
+  color: v.$color-gray-900;
+}
+
+h1 {
+  font-size: v.$font-size-5xl;
+}
+
+h2 {
+  font-size: v.$font-size-4xl;
+}
+
+h3 {
+  font-size: v.$font-size-3xl;
+}
+
+h4 {
+  font-size: v.$font-size-2xl;
+}
+
+h5 {
+  font-size: v.$font-size-xl;
+}
+
+h6 {
+  font-size: v.$font-size-lg;
+}
+
+/* Lists */
+ul, ol {
+  padding-left: 1.5rem;
+}
+
+li {
+  margin-bottom: 0.5rem;
+}
+
+/* Fix line height in Firefox */
+select, input, textarea {
+  line-height: normal;
 }
